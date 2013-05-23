@@ -1,4 +1,5 @@
-photoswipe
-==========
+## photoswipe
 
-图片预览组件
+* 版本：1.0
+
+
