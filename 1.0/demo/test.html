@@ -1,0 +1,4027 @@
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+<html manifest="http://www.taobao.com/go/chn/minfo/version.php">
+	<head>
+		<meta charset="gbk">
+		<title>淘宝门户首页</title>
+		<meta name="description" content="">
+		<!-- 响应式设计代码 -->
+		<meta name="viewport" content="width=320, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<!--不自动将地址和email转为链接-->
+		<meta name="format-detection" content="address=no;email=no" />
+		<!--添加到主屏时的图标-->
+		<link rel="apple-touch-icon-precomposed" href="http://img01.taobaocdn.com/tps/i1/T1p8O5XXtgXXXXXXXX-114-114.png">
+		<link rel="apple-touch-startup-image" href="http://img04.taobaocdn.com/tps/i4/T12UO6XnBuXXXXXXXX-320-460.png">
+		<link rel="stylesheet" href="photoswipe.css" />
+	</head>
+	<body>
+
+		<div class="page">
+			<!-- 页头 begin -->
+			<header class="header" id="siteHead">
+				<h1 id="logo" class="logo head-hidden"><a href="#index">淘宝门户</a></h1>
+				<span class="backbtn"><a href="#index/1">返回</a></span>
+				<nav id="headNav" class="head-nav">
+					<a href="#index/1" class="cur"><span>单品</span></a>
+					<a href="#index/2"><span>搭配</span></a>
+				</nav>
+			</header>
+			<!-- 页头 end -->
+			<!-- 主体 begin -->
+			<div class="content" id="wrapper">
+				<div class="scroll-area" id="iScrollArea">
+					
+				</div>
+			</div>
+			<!-- 主体 end -->
+			<!-- 页脚 begin -->
+			<footer class="footer">
+
+			</footer>
+			<!-- 页脚 end -->
+		</div>
+<script>
+/**
+ * DOM 方法集体
+ */
+
+var DOM = DOMHander = {
+	getAll:function(sel,par){
+		return (par||document).querySelectorAll(sel);
+	},
+	get:function(sel,par){
+		return this.getAll(sel,par)[0];
+	},
+	create:function(tag){
+		return document.createElement(tag);
+	},
+	getInnerHeight:function(){
+		return window.innerHeight;
+	},
+	addClass:function(el,name){
+		var className = el.className, classes =className.split(" "), newClassName=[];
+		for(i in classes){
+			if(classes[i]==name){
+				return;
+			}else{
+				if(classes[i]!=""){
+					newClassName.push(classes[i]);
+				}
+			}
+		}
+		newClassName.push(name);
+		el.className = newClassName.join(" ");
+	},
+	removeClass:function(el,names){
+		var className = el.className, classes =className.split(" "), newClassName=[];
+		function setNewName(){
+			for(i in classes){
+				if (names.push) {
+					var isRemove = false;
+					for (j in names) {
+						isRemove = isRemove||!(classes[i] != names[j] && classes[i] != "")
+					}
+					if(!isRemove)newClassName.push(classes[i]);
+				}
+				else {
+					if (classes[i] != names && classes[i] != "") {
+						newClassName.push(classes[i]);
+					}
+				}
+			}
+		}
+		setNewName()
+		
+		el.className = newClassName.join(" ");
+	},
+	removeStyle:function(el,name){
+		var style = el.getAttribute("style"), reg = new RegExp('^|\s|;\s'+name+'')
+	}
+}
+
+</script>
+<script>
+(function(){
+    var doc = document,
+    win = window,
+    LS = win.localStorage;
+    
+    function _get(name){
+        try{
+            return LS.getItem(name);
+        }catch(e){
+            return null;
+        }
+    }
+    function _getData(name){
+        var data = _get(name);
+        if(!data)
+            return null;
+        return JSON.parse(data);
+    }
+    /**
+     * 获取没有过期的数据
+     */
+    function _getDataWithTime(name){
+        var t = new Date().getTime(),
+        data = _getData(name);
+        if(!data)return null;
+        if(!data.expire){
+            return data;
+        }else{
+            if(data.expire>t){
+                return data;
+            }else{
+                LS.removeItem(name);
+                return null;
+            }
+        }
+    }
+    
+    
+    function _set(name,str){
+        try{
+            return LS.setItem(name,str);
+        }catch(e){
+            return null;
+        }
+        
+    }
+    function _setData(name,data){
+        return _set(name,JSON.stringify(data));
+    }
+    /**
+     * 设置带过期时间的数据(单位：小时)
+     */
+    function _setDataWithTime(name,data,expire){
+        data.expire = new Date().getTime() + expire*60*60*1000;
+        return _setData(name,data); 
+    }
+    
+    localData = {
+        get:_get,
+        getData:_getData,
+        getDataWithTime:_getDataWithTime,
+        set:_set,
+        setData:_setData,
+        setDataWithTime:_setDataWithTime
+    }
+})();
+
+</script>
+<script>
+/*!
+ * iScroll v4.1.9 ~ Copyright (c) 2011 Matteo Spinelli, http://cubiq.org
+ * Released under MIT license, http://cubiq.org/license
+ */
+(function(){
+var m = Math,
+	mround = function (r) { return r >> 0; },
+	vendor = (/webkit/i).test(navigator.appVersion) ? 'webkit' :
+		(/firefox/i).test(navigator.userAgent) ? 'Moz' :
+		(/trident/i).test(navigator.userAgent) ? 'ms' :
+		'opera' in window ? 'O' : '',
+
+    // Browser capabilities
+    isAndroid = (/android/gi).test(navigator.appVersion),
+    isIDevice = (/iphone|ipad/gi).test(navigator.appVersion),
+    isPlaybook = (/playbook/gi).test(navigator.appVersion),
+    isTouchPad = (/hp-tablet/gi).test(navigator.appVersion),
+
+    has3d = 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix(),
+    hasTouch = 'ontouchstart' in window && !isTouchPad,
+    hasTransform = vendor + 'Transform' in document.documentElement.style,
+    hasTransitionEnd = isIDevice || isPlaybook,
+
+	nextFrame = (function() {
+	    return window.requestAnimationFrame
+			|| window.webkitRequestAnimationFrame
+			|| window.mozRequestAnimationFrame
+			|| window.oRequestAnimationFrame
+			|| window.msRequestAnimationFrame
+			|| function(callback) { return setTimeout(callback, 1); }
+	})(),
+	cancelFrame = (function () {
+	    return window.cancelRequestAnimationFrame
+			|| window.webkitCancelAnimationFrame
+			|| window.webkitCancelRequestAnimationFrame
+			|| window.mozCancelRequestAnimationFrame
+			|| window.oCancelRequestAnimationFrame
+			|| window.msCancelRequestAnimationFrame
+			|| clearTimeout
+	})(),
+
+	// Events
+	RESIZE_EV = 'onorientationchange' in window ? 'orientationchange' : 'resize',
+	START_EV = hasTouch ? 'touchstart' : 'mousedown',
+	MOVE_EV = hasTouch ? 'touchmove' : 'mousemove',
+	END_EV = hasTouch ? 'touchend' : 'mouseup',
+	CANCEL_EV = hasTouch ? 'touchcancel' : 'mouseup',
+	WHEEL_EV = vendor == 'Moz' ? 'DOMMouseScroll' : 'mousewheel',
+
+	// Helpers
+	trnOpen = 'translate' + (has3d ? '3d(' : '('),
+	trnClose = has3d ? ',0)' : ')',
+
+	// Constructor
+	iScroll = function (el, options) {
+		var that = this,
+			doc = document,
+			i;
+
+		that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
+		that.wrapper.style.overflow = 'hidden';
+		that.scroller = that.wrapper.children[0];
+
+		// Default options
+		that.options = {
+			hScroll: true,
+			vScroll: true,
+			x: 0,
+			y: 0,
+			bounce: true,
+			bounceLock: false,
+			momentum: true,
+			lockDirection: true,
+			useTransform: true,
+			useTransition: false,
+			topOffset: 0,
+			checkDOMChanges: false,		// Experimental
+
+			// Scrollbar
+			hScrollbar: true,
+			vScrollbar: true,
+			fixedScrollbar: isAndroid,
+			hideScrollbar: isIDevice,
+			fadeScrollbar: isIDevice && has3d,
+			scrollbarClass: '',
+
+			// Zoom
+			zoom: false,
+			zoomMin: 1,
+			zoomMax: 4,
+			doubleTapZoom: 2,
+			wheelAction: 'scroll',
+
+			// Snap
+			snap: false,
+			snapThreshold: 1,
+
+			// Events
+			onRefresh: null,
+			onBeforeScrollStart: function (e) { e.preventDefault(); },
+			onScrollStart: null,
+			onBeforeScrollMove: null,
+			onScrollMove: null,
+			onBeforeScrollEnd: null,
+			onScrollEnd: null,
+			onTouchEnd: null,
+			onDestroy: null,
+			onZoomStart: null,
+			onZoom: null,
+			onZoomEnd: null
+		};
+
+		// User defined options
+		for (i in options) that.options[i] = options[i];
+		
+		// Set starting position
+		that.x = that.options.x;
+		that.y = that.options.y;
+
+		// Normalize options
+		that.options.useTransform = hasTransform ? that.options.useTransform : false;
+		that.options.hScrollbar = that.options.hScroll && that.options.hScrollbar;
+		that.options.vScrollbar = that.options.vScroll && that.options.vScrollbar;
+		that.options.zoom = that.options.useTransform && that.options.zoom;
+		that.options.useTransition = hasTransitionEnd && that.options.useTransition;
+
+		// Helpers FIX ANDROID BUG!
+		// translate3d and scale doesn't work together! 
+		// Ignoring 3d ONLY WHEN YOU SET that.options.zoom
+		if ( that.options.zoom && isAndroid ){
+			trnOpen = 'translate(';
+			trnClose = ')';
+		}
+		
+		// Set some default styles
+		that.scroller.style[vendor + 'TransitionProperty'] = that.options.useTransform ? '-' + vendor.toLowerCase() + '-transform' : 'top left';
+		that.scroller.style[vendor + 'TransitionDuration'] = '0';
+		that.scroller.style[vendor + 'TransformOrigin'] = '0 0';
+		if (that.options.useTransition) that.scroller.style[vendor + 'TransitionTimingFunction'] = 'cubic-bezier(0.33,0.66,0.66,1)';
+		
+		if (that.options.useTransform) that.scroller.style[vendor + 'Transform'] = trnOpen + that.x + 'px,' + that.y + 'px' + trnClose;
+		else that.scroller.style.cssText += ';position:absolute;top:' + that.y + 'px;left:' + that.x + 'px';
+
+		if (that.options.useTransition) that.options.fixedScrollbar = true;
+
+		that.refresh();
+
+		that._bind(RESIZE_EV, window);
+		that._bind(START_EV);
+		if (!hasTouch) {
+			that._bind('mouseout', that.wrapper);
+			if (that.options.wheelAction != 'none')
+				that._bind(WHEEL_EV);
+		}
+
+		if (that.options.checkDOMChanges) that.checkDOMTime = setInterval(function () {
+			that._checkDOMChanges();
+		}, 500);
+	};
+
+// Prototype
+iScroll.prototype = {
+	enabled: true,
+	x: 0,
+	y: 0,
+	steps: [],
+	scale: 1,
+	currPageX: 0, currPageY: 0,
+	pagesX: [], pagesY: [],
+	aniTime: null,
+	wheelZoomCount: 0,
+	
+	handleEvent: function (e) {
+		var that = this;
+		switch(e.type) {
+			case START_EV:
+				if (!hasTouch && e.button !== 0) return;
+				that._start(e);
+				break;
+			case MOVE_EV: that._move(e); break;
+			case END_EV:
+			case CANCEL_EV: that._end(e); break;
+			case RESIZE_EV: that._resize(); break;
+			case WHEEL_EV: that._wheel(e); break;
+			case 'mouseout': that._mouseout(e); break;
+			case 'webkitTransitionEnd': that._transitionEnd(e); break;
+		}
+	},
+	
+	_checkDOMChanges: function () {
+		if (this.moved || this.zoomed || this.animating ||
+			(this.scrollerW == this.scroller.offsetWidth * this.scale && this.scrollerH == this.scroller.offsetHeight * this.scale)) return;
+
+		this.refresh();
+	},
+	
+	_scrollbar: function (dir) {
+		var that = this,
+			doc = document,
+			bar;
+
+		if (!that[dir + 'Scrollbar']) {
+			if (that[dir + 'ScrollbarWrapper']) {
+				if (hasTransform) that[dir + 'ScrollbarIndicator'].style[vendor + 'Transform'] = '';
+				that[dir + 'ScrollbarWrapper'].parentNode.removeChild(that[dir + 'ScrollbarWrapper']);
+				that[dir + 'ScrollbarWrapper'] = null;
+				that[dir + 'ScrollbarIndicator'] = null;
+			}
+
+			return;
+		}
+
+		if (!that[dir + 'ScrollbarWrapper']) {
+			// Create the scrollbar wrapper
+			bar = doc.createElement('div');
+
+			if (that.options.scrollbarClass) bar.className = that.options.scrollbarClass + dir.toUpperCase();
+			else bar.style.cssText = 'position:absolute;z-index:100;' + (dir == 'h' ? 'height:7px;bottom:1px;left:2px;right:' + (that.vScrollbar ? '7' : '2') + 'px' : 'width:7px;bottom:' + (that.hScrollbar ? '7' : '2') + 'px;top:2px;right:1px');
+
+			bar.style.cssText += ';pointer-events:none;-' + vendor + '-transition-property:opacity;-' + vendor + '-transition-duration:' + (that.options.fadeScrollbar ? '350ms' : '0') + ';overflow:hidden;opacity:' + (that.options.hideScrollbar ? '0' : '1');
+
+			that.wrapper.appendChild(bar);
+			that[dir + 'ScrollbarWrapper'] = bar;
+
+			// Create the scrollbar indicator
+			bar = doc.createElement('div');
+			if (!that.options.scrollbarClass) {
+				bar.style.cssText = 'position:absolute;z-index:100;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.9);-' + vendor + '-background-clip:padding-box;-' + vendor + '-box-sizing:border-box;' + (dir == 'h' ? 'height:100%' : 'width:100%') + ';-' + vendor + '-border-radius:3px;border-radius:3px';
+			}
+			bar.style.cssText += ';pointer-events:none;-' + vendor + '-transition-property:-' + vendor + '-transform;-' + vendor + '-transition-timing-function:cubic-bezier(0.33,0.66,0.66,1);-' + vendor + '-transition-duration:0;-' + vendor + '-transform:' + trnOpen + '0,0' + trnClose;
+			if (that.options.useTransition) bar.style.cssText += ';-' + vendor + '-transition-timing-function:cubic-bezier(0.33,0.66,0.66,1)';
+
+			that[dir + 'ScrollbarWrapper'].appendChild(bar);
+			that[dir + 'ScrollbarIndicator'] = bar;
+		}
+
+		if (dir == 'h') {
+			that.hScrollbarSize = that.hScrollbarWrapper.clientWidth;
+			that.hScrollbarIndicatorSize = m.max(mround(that.hScrollbarSize * that.hScrollbarSize / that.scrollerW), 8);
+			that.hScrollbarIndicator.style.width = that.hScrollbarIndicatorSize + 'px';
+			that.hScrollbarMaxScroll = that.hScrollbarSize - that.hScrollbarIndicatorSize;
+			that.hScrollbarProp = that.hScrollbarMaxScroll / that.maxScrollX;
+		} else {
+			that.vScrollbarSize = that.vScrollbarWrapper.clientHeight;
+			that.vScrollbarIndicatorSize = m.max(mround(that.vScrollbarSize * that.vScrollbarSize / that.scrollerH), 8);
+			that.vScrollbarIndicator.style.height = that.vScrollbarIndicatorSize + 'px';
+			that.vScrollbarMaxScroll = that.vScrollbarSize - that.vScrollbarIndicatorSize;
+			that.vScrollbarProp = that.vScrollbarMaxScroll / that.maxScrollY;
+		}
+
+		// Reset position
+		that._scrollbarPos(dir, true);
+	},
+	
+	_resize: function () {
+		var that = this;
+		setTimeout(function () { that.refresh(); }, isAndroid ? 200 : 0);
+	},
+	
+	_pos: function (x, y) {
+	    var that = this;
+	    
+		x = this.hScroll ? x : 0;
+		y = this.vScroll ? y : 0;
+
+		if (this.options.useTransform) {
+			this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
+		} else {
+			x = mround(x);
+			y = mround(y);
+			this.scroller.style.left = x + 'px';
+			this.scroller.style.top = y + 'px';
+		}
+
+		this.x = x;
+		this.y = y;
+        
+		this._scrollbarPos('h');
+		this._scrollbarPos('v');
+		if (that.options.onScrollMove) that.options.onScrollMove.call(that);
+	},
+
+	_scrollbarPos: function (dir, hidden) {
+		var that = this,
+			pos = dir == 'h' ? that.x : that.y,
+			size;
+
+		if (!that[dir + 'Scrollbar']) return;
+
+		pos = that[dir + 'ScrollbarProp'] * pos;
+
+		if (pos < 0) {
+			if (!that.options.fixedScrollbar) {
+				size = that[dir + 'ScrollbarIndicatorSize'] + mround(pos * 3);
+				if (size < 8) size = 8;
+				that[dir + 'ScrollbarIndicator'].style[dir == 'h' ? 'width' : 'height'] = size + 'px';
+			}
+			pos = 0;
+		} else if (pos > that[dir + 'ScrollbarMaxScroll']) {
+			if (!that.options.fixedScrollbar) {
+				size = that[dir + 'ScrollbarIndicatorSize'] - mround((pos - that[dir + 'ScrollbarMaxScroll']) * 3);
+				if (size < 8) size = 8;
+				that[dir + 'ScrollbarIndicator'].style[dir == 'h' ? 'width' : 'height'] = size + 'px';
+				pos = that[dir + 'ScrollbarMaxScroll'] + (that[dir + 'ScrollbarIndicatorSize'] - size);
+			} else {
+				pos = that[dir + 'ScrollbarMaxScroll'];
+			}
+		}
+
+		that[dir + 'ScrollbarWrapper'].style[vendor + 'TransitionDelay'] = '0';
+		that[dir + 'ScrollbarWrapper'].style.opacity = hidden && that.options.hideScrollbar ? '0' : '1';
+		that[dir + 'ScrollbarIndicator'].style[vendor + 'Transform'] = trnOpen + (dir == 'h' ? pos + 'px,0' : '0,' + pos + 'px') + trnClose;
+	},
+	
+	_start: function (e) {
+		var that = this,
+			point = hasTouch ? e.touches[0] : e,
+			matrix, x, y,
+			c1, c2;
+
+		if (!that.enabled) return;
+
+		if (that.options.onBeforeScrollStart) that.options.onBeforeScrollStart.call(that, e);
+
+		if (that.options.useTransition || that.options.zoom) that._transitionTime(0);
+
+		that.moved = false;
+		that.animating = false;
+		that.zoomed = false;
+		that.distX = 0;
+		that.distY = 0;
+		that.absDistX = 0;
+		that.absDistY = 0;
+		that.dirX = 0;
+		that.dirY = 0;
+
+		// Gesture start
+		if (that.options.zoom && hasTouch && e.touches.length > 1) {
+			c1 = m.abs(e.touches[0].pageX-e.touches[1].pageX);
+			c2 = m.abs(e.touches[0].pageY-e.touches[1].pageY);
+			that.touchesDistStart = m.sqrt(c1 * c1 + c2 * c2);
+
+			that.originX = m.abs(e.touches[0].pageX + e.touches[1].pageX - that.wrapperOffsetLeft * 2) / 2 - that.x;
+			that.originY = m.abs(e.touches[0].pageY + e.touches[1].pageY - that.wrapperOffsetTop * 2) / 2 - that.y;
+
+			if (that.options.onZoomStart) that.options.onZoomStart.call(that, e);
+		}
+
+		if (that.options.momentum) {
+			if (that.options.useTransform) {
+				// Very lame general purpose alternative to CSSMatrix
+				matrix = getComputedStyle(that.scroller, null)[vendor + 'Transform'].replace(/[^0-9-.,]/g, '').split(',');
+				x = matrix[4] * 1;
+				y = matrix[5] * 1;
+			} else {
+				x = getComputedStyle(that.scroller, null).left.replace(/[^0-9-]/g, '') * 1;
+				y = getComputedStyle(that.scroller, null).top.replace(/[^0-9-]/g, '') * 1;
+			}
+			
+			if (x != that.x || y != that.y) {
+				if (that.options.useTransition) that._unbind('webkitTransitionEnd');
+				else cancelFrame(that.aniTime);
+				that.steps = [];
+				that._pos(x, y);
+			}
+		}
+
+		that.absStartX = that.x;	// Needed by snap threshold
+		that.absStartY = that.y;
+
+		that.startX = that.x;
+		that.startY = that.y;
+		that.pointX = point.pageX;
+		that.pointY = point.pageY;
+
+		that.startTime = e.timeStamp || Date.now();
+
+		if (that.options.onScrollStart) that.options.onScrollStart.call(that, e);
+
+		that._bind(MOVE_EV);
+		that._bind(END_EV);
+		that._bind(CANCEL_EV);
+	},
+	
+	_move: function (e) {
+		var that = this,
+			point = hasTouch ? e.touches[0] : e,
+			deltaX = point.pageX - that.pointX,
+			deltaY = point.pageY - that.pointY,
+			newX = that.x + deltaX,
+			newY = that.y + deltaY,
+			c1, c2, scale,
+			timestamp = e.timeStamp || Date.now();
+
+		if (that.options.onBeforeScrollMove) that.options.onBeforeScrollMove.call(that, e);
+
+		// Zoom
+		if (that.options.zoom && hasTouch && e.touches.length > 1) {
+			c1 = m.abs(e.touches[0].pageX - e.touches[1].pageX);
+			c2 = m.abs(e.touches[0].pageY - e.touches[1].pageY);
+			that.touchesDist = m.sqrt(c1*c1+c2*c2);
+
+			that.zoomed = true;
+
+			scale = 1 / that.touchesDistStart * that.touchesDist * this.scale;
+
+			if (scale < that.options.zoomMin) scale = 0.5 * that.options.zoomMin * Math.pow(2.0, scale / that.options.zoomMin);
+			else if (scale > that.options.zoomMax) scale = 2.0 * that.options.zoomMax * Math.pow(0.5, that.options.zoomMax / scale);
+
+			that.lastScale = scale / this.scale;
+
+			newX = this.originX - this.originX * that.lastScale + this.x,
+			newY = this.originY - this.originY * that.lastScale + this.y;
+
+			this.scroller.style[vendor + 'Transform'] = trnOpen + newX + 'px,' + newY + 'px' + trnClose + ' scale(' + scale + ')';
+
+			if (that.options.onZoom) that.options.onZoom.call(that, e);
+			return;
+		}
+
+		that.pointX = point.pageX;
+		that.pointY = point.pageY;
+
+		// Slow down if outside of the boundaries
+		if (newX > 0 || newX < that.maxScrollX) {
+			newX = that.options.bounce ? that.x + (deltaX / 2) : newX >= 0 || that.maxScrollX >= 0 ? 0 : that.maxScrollX;
+		}
+		if (newY > that.minScrollY || newY < that.maxScrollY) { 
+			newY = that.options.bounce ? that.y + (deltaY / 2) : newY >= that.minScrollY || that.maxScrollY >= 0 ? that.minScrollY : that.maxScrollY;
+		}
+
+		that.distX += deltaX;
+		that.distY += deltaY;
+		that.absDistX = m.abs(that.distX);
+		that.absDistY = m.abs(that.distY);
+
+		if (that.absDistX < 6 && that.absDistY < 6) {
+			return;
+		}
+
+		// Lock direction
+		if (that.options.lockDirection) {
+			if (that.absDistX > that.absDistY + 5) {
+				newY = that.y;
+				deltaY = 0;
+			} else if (that.absDistY > that.absDistX + 5) {
+				newX = that.x;
+				deltaX = 0;
+			}
+		}
+
+		that.moved = true;
+		that._pos(newX, newY);
+		that.dirX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
+		that.dirY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
+
+		if (timestamp - that.startTime > 300) {
+			that.startTime = timestamp;
+			that.startX = that.x;
+			that.startY = that.y;
+		}
+		
+		if (that.options.onScrollMove) that.options.onScrollMove.call(that, e);
+	},
+	
+	_end: function (e) {
+		if (hasTouch && e.touches.length != 0) return;
+
+		var that = this,
+			point = hasTouch ? e.changedTouches[0] : e,
+			target, ev,
+			momentumX = { dist:0, time:0 },
+			momentumY = { dist:0, time:0 },
+			duration = (e.timeStamp || Date.now()) - that.startTime,
+			newPosX = that.x,
+			newPosY = that.y,
+			distX, distY,
+			newDuration,
+			snap,
+			scale;
+
+		that._unbind(MOVE_EV);
+		that._unbind(END_EV);
+		that._unbind(CANCEL_EV);
+
+		if (that.options.onBeforeScrollEnd) that.options.onBeforeScrollEnd.call(that, e);
+
+		if (that.zoomed) {
+			scale = that.scale * that.lastScale;
+			scale = Math.max(that.options.zoomMin, scale);
+			scale = Math.min(that.options.zoomMax, scale);
+			that.lastScale = scale / that.scale;
+			that.scale = scale;
+
+			that.x = that.originX - that.originX * that.lastScale + that.x;
+			that.y = that.originY - that.originY * that.lastScale + that.y;
+			
+			that.scroller.style[vendor + 'TransitionDuration'] = '200ms';
+			that.scroller.style[vendor + 'Transform'] = trnOpen + that.x + 'px,' + that.y + 'px' + trnClose + ' scale(' + that.scale + ')';
+			
+			that.zoomed = false;
+			that.refresh();
+
+			if (that.options.onZoomEnd) that.options.onZoomEnd.call(that, e);
+			return;
+		}
+
+		if (!that.moved) {
+			if (hasTouch) {
+				if (that.doubleTapTimer && that.options.zoom) {
+					// Double tapped
+					clearTimeout(that.doubleTapTimer);
+					that.doubleTapTimer = null;
+					if (that.options.onZoomStart) that.options.onZoomStart.call(that, e);
+					that.zoom(that.pointX, that.pointY, that.scale == 1 ? that.options.doubleTapZoom : 1);
+					if (that.options.onZoomEnd) {
+						setTimeout(function() {
+							that.options.onZoomEnd.call(that, e);
+						}, 200); // 200 is default zoom duration
+					}
+				} else {
+					that.doubleTapTimer = setTimeout(function () {
+						that.doubleTapTimer = null;
+
+						// Find the last touched element
+						target = point.target;
+						while (target.nodeType != 1) target = target.parentNode;
+
+						if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA') {
+							ev = document.createEvent('MouseEvents');
+							ev.initMouseEvent('click', true, true, e.view, 1,
+								point.screenX, point.screenY, point.clientX, point.clientY,
+								e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+								0, null);
+							ev._fake = true;
+							target.dispatchEvent(ev);
+						}
+					}, that.options.zoom ? 250 : 0);
+				}
+			}
+
+			that._resetPos(200);
+
+			if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);
+			return;
+		}
+
+		if (duration < 300 && that.options.momentum) {
+			momentumX = newPosX ? that._momentum(newPosX - that.startX, duration, -that.x, that.scrollerW - that.wrapperW + that.x, that.options.bounce ? that.wrapperW : 0) : momentumX;
+			momentumY = newPosY ? that._momentum(newPosY - that.startY, duration, -that.y, (that.maxScrollY < 0 ? that.scrollerH - that.wrapperH + that.y - that.minScrollY : 0), that.options.bounce ? that.wrapperH : 0) : momentumY;
+
+			newPosX = that.x + momentumX.dist;
+			newPosY = that.y + momentumY.dist;
+
+ 			if ((that.x > 0 && newPosX > 0) || (that.x < that.maxScrollX && newPosX < that.maxScrollX)) momentumX = { dist:0, time:0 };
+ 			if ((that.y > that.minScrollY && newPosY > that.minScrollY) || (that.y < that.maxScrollY && newPosY < that.maxScrollY)) momentumY = { dist:0, time:0 };
+		}
+
+		if (momentumX.dist || momentumY.dist) {
+			newDuration = m.max(m.max(momentumX.time, momentumY.time), 10);
+
+			// Do we need to snap?
+			if (that.options.snap) {
+				distX = newPosX - that.absStartX;
+				distY = newPosY - that.absStartY;
+				if (m.abs(distX) < that.options.snapThreshold && m.abs(distY) < that.options.snapThreshold) { that.scrollTo(that.absStartX, that.absStartY, 200); }
+				else {
+					snap = that._snap(newPosX, newPosY);
+					newPosX = snap.x;
+					newPosY = snap.y;
+					newDuration = m.max(snap.time, newDuration);
+				}
+			}
+
+			that.scrollTo(mround(newPosX), mround(newPosY), newDuration);
+
+			if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);
+			return;
+		}
+
+		// Do we need to snap?
+		if (that.options.snap) {
+			distX = newPosX - that.absStartX;
+			distY = newPosY - that.absStartY;
+			if (m.abs(distX) < that.options.snapThreshold && m.abs(distY) < that.options.snapThreshold) that.scrollTo(that.absStartX, that.absStartY, 200);
+			else {
+				snap = that._snap(that.x, that.y);
+				if (snap.x != that.x || snap.y != that.y) that.scrollTo(snap.x, snap.y, snap.time);
+			}
+
+			if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);
+			return;
+		}
+
+		that._resetPos(200);
+		if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);
+	},
+	
+	_resetPos: function (time) {
+		var that = this,
+			resetX = that.x >= 0 ? 0 : that.x < that.maxScrollX ? that.maxScrollX : that.x,
+			resetY = that.y >= that.minScrollY || that.maxScrollY > 0 ? that.minScrollY : that.y < that.maxScrollY ? that.maxScrollY : that.y;
+
+		if (resetX == that.x && resetY == that.y) {
+			if (that.moved) {
+				that.moved = false;
+				if (that.options.onScrollEnd) that.options.onScrollEnd.call(that);		// Execute custom code on scroll end
+			}
+
+			if (that.hScrollbar && that.options.hideScrollbar) {
+				if (vendor == 'webkit') that.hScrollbarWrapper.style[vendor + 'TransitionDelay'] = '300ms';
+				that.hScrollbarWrapper.style.opacity = '0';
+			}
+			if (that.vScrollbar && that.options.hideScrollbar) {
+				if (vendor == 'webkit') that.vScrollbarWrapper.style[vendor + 'TransitionDelay'] = '300ms';
+				that.vScrollbarWrapper.style.opacity = '0';
+			}
+
+			return;
+		}
+
+		that.scrollTo(resetX, resetY, time || 0);
+	},
+
+	_wheel: function (e) {
+		var that = this,
+			wheelDeltaX, wheelDeltaY,
+			deltaX, deltaY,
+			deltaScale;
+
+		if ('wheelDeltaX' in e) {
+			wheelDeltaX = e.wheelDeltaX / 12;
+			wheelDeltaY = e.wheelDeltaY / 12;
+		} else if('wheelDelta' in e) {
+			wheelDeltaX = wheelDeltaY = e.wheelDelta / 12;
+		} else if ('detail' in e) {
+			wheelDeltaX = wheelDeltaY = -e.detail * 3;
+		} else {
+			return;
+		}
+		
+		if (that.options.wheelAction == 'zoom') {
+			deltaScale = that.scale * Math.pow(2, 1/3 * (wheelDeltaY ? wheelDeltaY / Math.abs(wheelDeltaY) : 0));
+			if (deltaScale < that.options.zoomMin) deltaScale = that.options.zoomMin;
+			if (deltaScale > that.options.zoomMax) deltaScale = that.options.zoomMax;
+			
+			if (deltaScale != that.scale) {
+				if (!that.wheelZoomCount && that.options.onZoomStart) that.options.onZoomStart.call(that, e);
+				that.wheelZoomCount++;
+				
+				that.zoom(e.pageX, e.pageY, deltaScale, 400);
+				
+				setTimeout(function() {
+					that.wheelZoomCount--;
+					if (!that.wheelZoomCount && that.options.onZoomEnd) that.options.onZoomEnd.call(that, e);
+				}, 400);
+			}
+			
+			return;
+		}
+		
+		deltaX = that.x + wheelDeltaX;
+		deltaY = that.y + wheelDeltaY;
+
+		if (deltaX > 0) deltaX = 0;
+		else if (deltaX < that.maxScrollX) deltaX = that.maxScrollX;
+
+		if (deltaY > that.minScrollY) deltaY = that.minScrollY;
+		else if (deltaY < that.maxScrollY) deltaY = that.maxScrollY;
+
+		that.scrollTo(deltaX, deltaY, 0);
+	},
+	
+	_mouseout: function (e) {
+		var t = e.relatedTarget;
+
+		if (!t) {
+			this._end(e);
+			return;
+		}
+
+		while (t = t.parentNode) if (t == this.wrapper) return;
+		
+		this._end(e);
+	},
+
+	_transitionEnd: function (e) {
+		var that = this;
+
+		if (e.target != that.scroller) return;
+
+		that._unbind('webkitTransitionEnd');
+		
+		that._startAni();
+	},
+
+
+	/**
+	 *
+	 * Utilities
+	 *
+	 */
+	_startAni: function () {
+		var that = this,
+			startX = that.x, startY = that.y,
+			startTime = Date.now(),
+			step, easeOut,
+			animate;
+
+		if (that.animating) return;
+		
+		if (!that.steps.length) {
+			that._resetPos(400);
+			return;
+		}
+		
+		step = that.steps.shift();
+		
+		if (step.x == startX && step.y == startY) step.time = 0;
+
+		that.animating = true;
+		that.moved = true;
+		
+		if (that.options.useTransition) {
+			that._transitionTime(step.time);
+			that._pos(step.x, step.y);
+			that.animating = false;
+			if (step.time) that._bind('webkitTransitionEnd');
+			else that._resetPos(0);
+			return;
+		}
+
+		animate = function () {
+			var now = Date.now(),
+				newX, newY;
+
+			if (now >= startTime + step.time) {
+				that._pos(step.x, step.y);
+				that.animating = false;
+				if (that.options.onAnimationEnd) that.options.onAnimationEnd.call(that);			// Execute custom code on animation end
+				that._startAni();
+				return;
+			}
+
+			now = (now - startTime) / step.time - 1;
+			easeOut = m.sqrt(1 - now * now);
+			newX = (step.x - startX) * easeOut + startX;
+			newY = (step.y - startY) * easeOut + startY;
+			that._pos(newX, newY);
+			if (that.animating) that.aniTime = nextFrame(animate);
+		};
+
+		animate();
+	},
+
+	_transitionTime: function (time) {
+		time += 'ms';
+		this.scroller.style[vendor + 'TransitionDuration'] = time;
+		if (this.hScrollbar) this.hScrollbarIndicator.style[vendor + 'TransitionDuration'] = time;
+		if (this.vScrollbar) this.vScrollbarIndicator.style[vendor + 'TransitionDuration'] = time;
+	},
+
+	_momentum: function (dist, time, maxDistUpper, maxDistLower, size) {
+		var deceleration = 0.0006,
+			speed = m.abs(dist) / time,
+			newDist = (speed * speed) / (2 * deceleration),
+			newTime = 0, outsideDist = 0;
+
+		// Proportinally reduce speed if we are outside of the boundaries 
+		if (dist > 0 && newDist > maxDistUpper) {
+			outsideDist = size / (6 / (newDist / speed * deceleration));
+			maxDistUpper = maxDistUpper + outsideDist;
+			speed = speed * maxDistUpper / newDist;
+			newDist = maxDistUpper;
+		} else if (dist < 0 && newDist > maxDistLower) {
+			outsideDist = size / (6 / (newDist / speed * deceleration));
+			maxDistLower = maxDistLower + outsideDist;
+			speed = speed * maxDistLower / newDist;
+			newDist = maxDistLower;
+		}
+
+		newDist = newDist * (dist < 0 ? -1 : 1);
+		newTime = speed / deceleration;
+
+		return { dist: newDist, time: mround(newTime) };
+	},
+
+	_offset: function (el) {
+		var left = -el.offsetLeft,
+			top = -el.offsetTop;
+			
+		while (el = el.offsetParent) {
+			left -= el.offsetLeft;
+			top -= el.offsetTop;
+		}
+		
+		if (el != this.wrapper) {
+			left *= this.scale;
+			top *= this.scale;
+		}
+
+		return { left: left, top: top };
+	},
+
+	_snap: function (x, y) {
+		var that = this,
+			i, l,
+			page, time,
+			sizeX, sizeY;
+
+		// Check page X
+		page = that.pagesX.length - 1;
+		for (i=0, l=that.pagesX.length; i<l; i++) {
+			if (x >= that.pagesX[i]) {
+				page = i;
+				break;
+			}
+		}
+		if (page == that.currPageX && page > 0 && that.dirX < 0) page--;
+		x = that.pagesX[page];
+		sizeX = m.abs(x - that.pagesX[that.currPageX]);
+		sizeX = sizeX ? m.abs(that.x - x) / sizeX * 500 : 0;
+		that.currPageX = page;
+
+		// Check page Y
+		page = that.pagesY.length-1;
+		for (i=0; i<page; i++) {
+			if (y >= that.pagesY[i]) {
+				page = i;
+				break;
+			}
+		}
+		if (page == that.currPageY && page > 0 && that.dirY < 0) page--;
+		y = that.pagesY[page];
+		sizeY = m.abs(y - that.pagesY[that.currPageY]);
+		sizeY = sizeY ? m.abs(that.y - y) / sizeY * 500 : 0;
+		that.currPageY = page;
+
+		// Snap with constant speed (proportional duration)
+		time = mround(m.max(sizeX, sizeY)) || 200;
+
+		return { x: x, y: y, time: time };
+	},
+
+	_bind: function (type, el, bubble) {
+		(el || this.scroller).addEventListener(type, this, !!bubble);
+	},
+
+	_unbind: function (type, el, bubble) {
+		(el || this.scroller).removeEventListener(type, this, !!bubble);
+	},
+
+
+	/**
+	 *
+	 * Public methods
+	 *
+	 */
+	destroy: function () {
+		var that = this;
+
+		that.scroller.style[vendor + 'Transform'] = '';
+
+		// Remove the scrollbars
+		that.hScrollbar = false;
+		that.vScrollbar = false;
+		that._scrollbar('h');
+		that._scrollbar('v');
+
+		// Remove the event listeners
+		that._unbind(RESIZE_EV, window);
+		that._unbind(START_EV);
+		that._unbind(MOVE_EV);
+		that._unbind(END_EV);
+		that._unbind(CANCEL_EV);
+		
+		if (!that.options.hasTouch) {
+			that._unbind('mouseout', that.wrapper);
+			that._unbind(WHEEL_EV);
+		}
+		
+		if (that.options.useTransition) that._unbind('webkitTransitionEnd');
+		
+		if (that.options.checkDOMChanges) clearInterval(that.checkDOMTime);
+		
+		if (that.options.onDestroy) that.options.onDestroy.call(that);
+	},
+
+	refresh: function () {
+		var that = this,
+			offset,
+			i, l,
+			els,
+			pos = 0,
+			page = 0;
+
+		if (that.scale < that.options.zoomMin) that.scale = that.options.zoomMin;
+		that.wrapperW = that.wrapper.clientWidth || 1;
+		that.wrapperH = that.wrapper.clientHeight || 1;
+
+		that.minScrollY = -that.options.topOffset || 0;
+		that.scrollerW = mround(that.scroller.offsetWidth * that.scale);
+		that.scrollerH = mround((that.scroller.offsetHeight + that.minScrollY) * that.scale);
+		that.maxScrollX = that.wrapperW - that.scrollerW;
+		that.maxScrollY = that.wrapperH - that.scrollerH + that.minScrollY;
+		that.dirX = 0;
+		that.dirY = 0;
+
+		if (that.options.onRefresh) that.options.onRefresh.call(that);
+
+		that.hScroll = that.options.hScroll && that.maxScrollX < 0;
+		that.vScroll = that.options.vScroll && (!that.options.bounceLock && !that.hScroll || that.scrollerH > that.wrapperH);
+
+		that.hScrollbar = that.hScroll && that.options.hScrollbar;
+		that.vScrollbar = that.vScroll && that.options.vScrollbar && that.scrollerH > that.wrapperH;
+
+		offset = that._offset(that.wrapper);
+		that.wrapperOffsetLeft = -offset.left;
+		that.wrapperOffsetTop = -offset.top;
+
+		// Prepare snap
+		if (typeof that.options.snap == 'string') {
+			that.pagesX = [];
+			that.pagesY = [];
+			els = that.scroller.querySelectorAll(that.options.snap);
+			for (i=0, l=els.length; i<l; i++) {
+				pos = that._offset(els[i]);
+				pos.left += that.wrapperOffsetLeft;
+				pos.top += that.wrapperOffsetTop;
+				that.pagesX[i] = pos.left < that.maxScrollX ? that.maxScrollX : pos.left * that.scale;
+				that.pagesY[i] = pos.top < that.maxScrollY ? that.maxScrollY : pos.top * that.scale;
+			}
+		} else if (that.options.snap) {
+			that.pagesX = [];
+			while (pos >= that.maxScrollX) {
+				that.pagesX[page] = pos;
+				pos = pos - that.wrapperW;
+				page++;
+			}
+			if (that.maxScrollX%that.wrapperW) that.pagesX[that.pagesX.length] = that.maxScrollX - that.pagesX[that.pagesX.length-1] + that.pagesX[that.pagesX.length-1];
+
+			pos = 0;
+			page = 0;
+			that.pagesY = [];
+			while (pos >= that.maxScrollY) {
+				that.pagesY[page] = pos;
+				pos = pos - that.wrapperH;
+				page++;
+			}
+			if (that.maxScrollY%that.wrapperH) that.pagesY[that.pagesY.length] = that.maxScrollY - that.pagesY[that.pagesY.length-1] + that.pagesY[that.pagesY.length-1];
+		}
+
+		// Prepare the scrollbars
+		that._scrollbar('h');
+		that._scrollbar('v');
+
+		if (!that.zoomed) {
+			that.scroller.style[vendor + 'TransitionDuration'] = '0';
+			that._resetPos(200);
+		}
+	},
+
+	scrollTo: function (x, y, time, relative) {
+		var that = this,
+			step = x,
+			i, l;
+
+		that.stop();
+
+		if (!step.length) step = [{ x: x, y: y, time: time, relative: relative }];
+		
+		for (i=0, l=step.length; i<l; i++) {
+			if (step[i].relative) { step[i].x = that.x - step[i].x; step[i].y = that.y - step[i].y; }
+			that.steps.push({ x: step[i].x, y: step[i].y, time: step[i].time || 0 });
+		}
+
+		that._startAni();
+	},
+
+	scrollToElement: function (el, time) {
+		var that = this, pos;
+		el = el.nodeType ? el : that.scroller.querySelector(el);
+		if (!el) return;
+
+		pos = that._offset(el);
+		pos.left += that.wrapperOffsetLeft;
+		pos.top += that.wrapperOffsetTop;
+
+		pos.left = pos.left > 0 ? 0 : pos.left < that.maxScrollX ? that.maxScrollX : pos.left;
+		pos.top = pos.top > that.minScrollY ? that.minScrollY : pos.top < that.maxScrollY ? that.maxScrollY : pos.top;
+		time = time === undefined ? m.max(m.abs(pos.left)*2, m.abs(pos.top)*2) : time;
+
+		that.scrollTo(pos.left, pos.top, time);
+	},
+
+	scrollToPage: function (pageX, pageY, time) {
+		var that = this, x, y;
+		
+		time = time === undefined ? 400 : time;
+
+		if (that.options.onScrollStart) that.options.onScrollStart.call(that);
+
+		if (that.options.snap) {
+			pageX = pageX == 'next' ? that.currPageX+1 : pageX == 'prev' ? that.currPageX-1 : pageX;
+			pageY = pageY == 'next' ? that.currPageY+1 : pageY == 'prev' ? that.currPageY-1 : pageY;
+
+			pageX = pageX < 0 ? 0 : pageX > that.pagesX.length-1 ? that.pagesX.length-1 : pageX;
+			pageY = pageY < 0 ? 0 : pageY > that.pagesY.length-1 ? that.pagesY.length-1 : pageY;
+
+			that.currPageX = pageX;
+			that.currPageY = pageY;
+			x = that.pagesX[pageX];
+			y = that.pagesY[pageY];
+		} else {
+			x = -that.wrapperW * pageX;
+			y = -that.wrapperH * pageY;
+			if (x < that.maxScrollX) x = that.maxScrollX;
+			if (y < that.maxScrollY) y = that.maxScrollY;
+		}
+
+		that.scrollTo(x, y, time);
+	},
+
+	disable: function () {
+		this.stop();
+		this._resetPos(0);
+		this.enabled = false;
+
+		// If disabled after touchstart we make sure that there are no left over events
+		this._unbind(MOVE_EV);
+		this._unbind(END_EV);
+		this._unbind(CANCEL_EV);
+	},
+	
+	enable: function () {
+		this.enabled = true;
+	},
+	
+	stop: function () {
+		if (this.options.useTransition) this._unbind('webkitTransitionEnd');
+		else cancelFrame(this.aniTime);
+		this.steps = [];
+		this.moved = false;
+		this.animating = false;
+	},
+	
+	zoom: function (x, y, scale, time) {
+		var that = this,
+			relScale = scale / that.scale;
+
+		if (!that.options.useTransform) return;
+
+		that.zoomed = true;
+		time = time === undefined ? 200 : time;
+		x = x - that.wrapperOffsetLeft - that.x;
+		y = y - that.wrapperOffsetTop - that.y;
+		that.x = x - x * relScale + that.x;
+		that.y = y - y * relScale + that.y;
+
+		that.scale = scale;
+		that.refresh();
+
+		that.x = that.x > 0 ? 0 : that.x < that.maxScrollX ? that.maxScrollX : that.x;
+		that.y = that.y > that.minScrollY ? that.minScrollY : that.y < that.maxScrollY ? that.maxScrollY : that.y;
+
+		that.scroller.style[vendor + 'TransitionDuration'] = time + 'ms';
+		that.scroller.style[vendor + 'Transform'] = trnOpen + that.x + 'px,' + that.y + 'px' + trnClose + ' scale(' + scale + ')';
+		that.zoomed = false;
+	},
+	
+	isReady: function () {
+		return !this.moved && !this.zoomed && !this.animating;
+	}
+};
+
+if (typeof exports !== 'undefined') exports.iScroll = iScroll;
+else window.iScroll = iScroll;
+
+})();
+
+</script>
+<script>
+/**
+ * layoutHandler
+ * 处理各种界面变化
+ */
+function layoutHandler(el,config){
+	this.scroll;
+	this.wrapper = typeof el == 'object' ? el : DOM.get(el);
+	this.head = DOM.get("header");
+	this.isAndroid = (/android/gi).test(navigator.appVersion);
+	this.isIDevice = (/iphone|ipad/gi).test(navigator.appVersion);
+	this.config = config;
+}
+(function(){
+	var doc = document,
+	win = window;
+	layoutHandler.prototype = {
+		constructor:layoutHandler,
+		init:function(){
+			var self = this;
+			self._hideHead();
+			self._buildIScroll();
+			self.__windowEventHandler = function(){
+				self._resize();
+			}
+			window.addEventListener("scroll",self.__windowEventHandler,false);
+			window.addEventListener("resize",self.__windowEventHandler,false);
+			self.isDestroyed = false;
+		},
+		_hideHead:function(){
+			var self = this;
+			var headerHeight = this.head.offsetHeight;
+			if(self.isIDevice){
+    			
+    			
+    			setTimeout(function(){
+    			    self.wrapper.style.height = "1000px";
+    			    win.scrollTo(0,0);
+    			    self.wrapper.style.height = DOM.getInnerHeight()-headerHeight+"px";
+                    if(self.scroll){
+                        self._resize();
+                    }
+    			},0);
+    			
+			}
+			
+		},
+		_buildIScroll:function(){
+			var self = this;
+			if(self.isIDevice){
+			    self.wrapper.style.cssText = 'position:absolute; height:1000px';
+                self.wrapper.children[0].style.cssText = "position:absolute;";
+                DOM.get("html").style.overflow = "hidden";
+				self.scroll = new iScroll(self.wrapper, self.config);
+			}
+			self._resize();
+		},
+		_resize:function(){
+			var self = this;
+			if(self.scroll){
+				var headerHeight = this.head.offsetHeight,
+				contentHeight = this.wrapper.offsetHeight+headerHeight;
+				//self.wrapper.style.height = DOM.getInnerHeight()-headerHeight+"px";
+				self.scroll.refresh();
+				if(document.body.scrollTop>0){
+					win.scrollTo(0,0);
+				}
+			}else{
+				this.wrapper.style.cssText = 'position:relative; height:auto; min-height:'+(window.innerHeight-48)+'px; top:0;';
+				this.wrapper.children[0].style.cssText = "position:relative;"+'min-height:'+(window.innerHeight-48)+'px;';
+				if(this.wrapper.querySelector('.gallery-view-block')){
+				    if(window.innerHeight<400){
+				        this.wrapper.style.height = 450+"px";
+				        win.scrollTo(0,1);
+				    }
+				    setTimeout(function(){
+				        this.wrapper.style.height = (window.innerHeight-48)+'px';
+                        this.wrapper.children[0].style.height = (window.innerHeight-48)+'px';
+                        this.wrapper.querySelector(".gallery-view-block").style.height = (window.innerHeight-48)+'px';
+                        win.scrollTo(0,0);
+				    },100)
+				    
+				}else{
+				    this.wrapper.style.height = 'auto';
+				    this.wrapper.children[0].style.height = "auto";
+				}
+				DOM.get("html").style.overflow = "auto";
+			}
+		},
+		/**
+		 * 销毁实例
+		 */
+		destroy:function(){
+			var self = this;
+			//移除窗口绑定的事件
+			if(self.__windowEventHandler){
+				window.removeEventListener("scroll",self.__windowEventHandler);
+				window.removeEventListener("resize",self.__windowEventHandler);
+			}
+			//移除iScroll组件
+			if(self.scroll){
+				self.scroll.destroy();
+				self.scroll = null;
+			}
+			self.wrapper.style.cssText = 'position:relative; height:auto; min-height:'+(document.body.clientHeight-48)+'px; top:0;';
+            self.wrapper.children[0].style.cssText = "position:relative;";
+            DOM.get("html").style.overflow = "auto";
+			self.isDestroyed = true;
+		}
+		
+	}
+})();
+
+
+</script>
+<script>
+dataAccess = {
+	jsonp:function(url,fn,charset) {
+	    var doc = document,
+	        head = doc.head || doc.getElementsByTagName("head")[0],
+	        node = doc.createElement('script'),
+	        timestamp = new Date().getTime(),
+	        sp = (url.indexOf("?")>0)?"&":"?";
+	    node.type = "text/javascript";
+	    url = url+sp+"_="+timestamp;
+	    node.src = url;
+	    node.async = true;
+	    if (charset) {
+	        node.charset = charset;
+	    }
+	    node.addEventListener("load",function(){
+	    	fn&&fn();
+	    });
+	    head.insertBefore(node, head.firstChild);
+	    return node;
+	},
+	useLocalData:function(url,fn){
+	    var self = this,
+	    oldData = localData.getDataWithTime(url);
+	    if(oldData){
+	        setTimeout(function(){
+	            fn(oldData);
+	        },10);
+	    }else{
+	        self.jsonp(url)
+	    }
+	    return oldData;
+	},
+	getIndexData:function(url,fn){
+		var self = this,oldData;
+		self.indexListHandler = function(data){
+			View.renderTagList(data);
+			if(oldData!=data)
+			 localData.setDataWithTime(url,data,1);
+		};
+		oldData = self.useLocalData(url,self.indexListHandler);
+	},
+	getIndexScrollData:function(reqList,fn){
+	    var self = this,
+        cur = 0,
+        oldData;
+        self.listDataHandle = function(data){
+            
+            if(data.items.length%2)
+              data.items.pop();
+            if(oldData!=data)
+              localData.setDataWithTime(reqList[cur].url,data,1);
+            reqList[cur].fn(data);
+            cur++;
+            if(reqList[cur])
+                oldData = self.useLocalData(reqList[cur].url,self.listDataHandle);
+            else
+                fn&&fn();
+        }
+        oldData = self.useLocalData(reqList[cur].url,self.listDataHandle);
+	},
+	getDetailData:function(url,fn){
+		var self = this,
+		oldData;
+		self.detailDataHandle = function(data){
+			setTimeout(function(){View.renderDetailPage(data);},150);
+			if(oldData!=data)
+			 localData.setDataWithTime(url,data,1);
+		};
+		oldData = self.useLocalData(url,self.detailDataHandle);
+	},
+	getMoreDetailContent:function(fn){
+		var self = this,
+		url = Router.getNewDetailPage(),
+		oldData;
+		self.detailDataHandle = function(data){
+		    fn(data);
+		    if(oldData!=data)
+		      localData.setDataWithTime(url,data,1);
+		};
+		oldData = self.useLocalData(url,self.detailDataHandle);
+	},
+	getListData:function(url,tag){
+		var self = this,
+		oldData;
+		self.listDataHandle = function(data){
+		    data.tagName = tag;
+		    if(data.items.length%2)
+		      data.items.pop();
+		    if(oldData!=data)
+                localData.setDataWithTime(url,data,1);
+			View.renderListPage(data);
+		}
+		self.curListURL = url;
+
+		oldData = self.useLocalData(url,self.listDataHandle);
+	},
+	getMoreListContent:function(fn){
+	    var self = this,
+        url = Router.getNewListPage(),
+        oldData = localData.getDataWithTime(self.curListURL);
+        self.listDataHandle = function(data){
+            if(data.items.length%2)
+              data.items.pop();
+            fn(data);
+            //将新数据拼到旧数据的本地数据中
+            if(!oldData)return;
+            for(var i=0; i<data.items.length; i++){
+                oldData.items.push(data.items[i]);
+            }
+            oldData["currentpage"] = data["currentpage"];
+            localData.setDataWithTime(self.curListURL,oldData,1);
+        };
+        self.jsonp(url);
+	}
+}
+
+</script>
+<script>
+(function() {
+    var doc = document,
+    DA = dataAccess,
+    Log = console.log,
+    //loading动画canvas节点用的全局变量
+    loadingCanvas, canvasInterval, 
+    //布局
+    layout, 
+    //弹出大图对象（暂时不用）
+    popBigPicWrap, 
+    //首页列表标题数组
+    listObjArr = [],
+    //当前列表页面的标题
+    curTagname,
+    //页面容器
+    _wrapper = doc.getElementById("iScrollArea"),
+    //用于放置固定的标题使用的容器
+    _fixTitleWrapper = doc.createElement("div"),
+    //当前正在显示的标题
+    _curTitle = 0,
+    //上次浏览list页时的位置
+    lastListPos = 0,
+    //index请求队列
+    indexReqList,
+    //初次载入
+    firstLoad = true,
+    pageLoaded = false,
+    winHeight;
+    
+    /**
+     * 视图层对象
+     */
+    View = {
+        /**
+         * detail页是否是大图模式
+         */
+        isImgMode:true,
+        /**
+         * 初始化
+         */
+        init: function() {
+            var self = this;
+            layout = new layoutHandler("#wrapper", {
+                onScrollMove: function() {
+                    self.onScrollMove(-layout.scroll.y);
+                }
+            });
+            var body = doc.body;
+            window.addEventListener("scroll",function(){
+                if(!layout.scroll){
+                     self.onScrollMove(body.scrollTop-48);
+                }
+            });
+            
+            layout.init();
+            doc.querySelector("#wrapper").insertBefore(_fixTitleWrapper);
+            _fixTitleWrapper.style.cssText = "position:absolute; top:0px; left:0;width:100%; z-index:99";
+
+        },
+        /**
+         * iscoll滚动时触发的事件，各页面通过重写该方法来使用
+         */
+        onScrollMove: function() {},
+        /**
+         * 修改头部的状态
+         */
+        setHeadStatus: function(n, fn) {
+            var self = this,
+            headTabs = doc.querySelectorAll("#headNav a"),
+            curTab = doc.querySelector("#headNav .cur"),
+            logo = doc.querySelector("#siteHead .logo"),
+            btn = doc.querySelector("#siteHead .backbtn"),
+            link = doc.querySelector("#siteHead .backbtn a");
+            if(layout.isDestroyed){
+                layout.init();
+            }
+            if(userData.get("index") == "index/2"){
+                curTab.setAttribute("class", "");
+                headTabs[1].className = "cur";
+            }
+            if (headTabs[n - 1]) {
+                //切换标签状态
+                link.href = location.hash;
+                btn.className = "backbtn head-hidden";
+                if (logo.className.indexOf("head-hidden") > 0) logo.className = "logo";
+                curTab.className="";
+                headTabs[n - 1].className = "cur";
+            } else {
+                //设置并显示返回按钮
+                if (n == "detail") {
+                    if(Router.oldHash.indexOf("detail")==-1){
+                        link.href = Router.oldHash;
+                    }
+                    //如果不是返回列表页则清空
+                    if(Router.oldHash.indexOf("list")==-1&&Router.oldHash.indexOf("tag")==-1){
+                        lastListPos = 0;
+                    }
+                }
+                if (n == "list") {
+                    link.href = "#"+userData.get("index");
+                }
+                if (btn.className.indexOf("head-hidden") > 0) btn.className = "backbtn";
+                logo.className = "logo head-hidden";
+            }
+            if(layout.scroll)layout._hideHead();
+            winHeight = window.innerHeight;
+            pageLoaded  = false;
+            //显示载入中动画
+            this.showLoading(firstLoad);
+            firstLoad  = false;
+            //初始化全局变量（详情的标题容器，滚动事件）
+            this._removeDetailTitle();
+            
+            this.onScrollMove = function() {};
+            /**
+             * 初始化用户参数（以后使用本地存储来保存手机用户数据）
+             */
+            View.isImgMode = self._getDetailMode();
+            //执行回调
+            fn && fn();
+        },
+        /**
+         * 渲染数据模版
+         */
+        renderHTML: function(template, data) {
+            for (k in data) {
+                template = template.replace(new RegExp("{{" + k + "}}", "g"));
+            }
+            return template;
+        },
+        /**
+         * 创建页面框架
+         */
+        buildNewPage: function(fn) {
+            var page = doc.createElement("div"),
+            oldPage = _wrapper.querySelector(".switch-block"),
+            back = doc.querySelector(".J_cancleLoading");
+            //删除取消按钮
+            if(back){
+                back.parentNode.removeChild(back);
+            }
+            //layout._hideHead();
+            page.className = "switch-block";
+            page.style.cssText = "top:0; left:0; width:100%; position:absolute";
+            page.style.zIndex=-1;
+            layout.scroll&&(page.style.webkitTransform = "translate3d("+(_wrapper.clientWidth)+"px,"+(-layout.scroll.y)+"px,0)");
+            //清空固定标题位置相关的变量和容器
+            listObjArr = [];
+
+            return page;
+        },
+        /**
+         * 显示新页面
+         */
+        showNewPage: function(page, fn) {
+            var self = this,
+            oldPage;
+        
+            setTimeout(function() {
+                oldPage = _wrapper.querySelectorAll(".switch-block");
+                
+                if (oldPage[1]) oldPage[0].style.zIndex = "-1";
+                
+                page.style.zIndex = 10000;
+                page.style.webkitTransition = "all 0.3s";
+                setTimeout(function() {
+
+                    layout.scroll&&(page.style.webkitTransform = "translate3d(0px,"+(-layout.scroll.y)+"px,0)");
+                    
+                    setTimeout(function() {
+                        page.style.webkitTransition = "all 0s";
+                        if (oldPage[1]) _wrapper.removeChild(oldPage[0]);
+                        page.style.position = "relative";
+                        self._scrollToTop(page);
+                        page.style.webkitTransform = "translate3d(0px,0,0)";
+                        //清空固定标题
+                        _fixTitleWrapper.innerHTML = "";
+                        _fixTitleWrapper.style.webkitTransform="translate3d(0,0,0)";
+                        //清除弹出大图
+                        
+                        page.style.zIndex = 0;
+                        _wrapper.style.zIndex = 0;
+                        self.hideLoading();
+                        layout._resize();
+                        self._scrollToTop(page);
+                        //展示提示
+                        TipShow.showTip();
+                        fn && fn();
+                    },
+                    600);
+                },
+                20);
+
+            },
+            400)
+
+        },
+        /**
+         * 把页面滚动到头部
+         */
+        _scrollToTop: function(page) {
+            if (layout.scroll) {
+                layout.scroll.refresh();
+                layout.scroll.scrollTo(0,0, 0);
+            } else {
+                window.scrollTo(0, 0);
+            }
+        },
+        /*******************************************************************
+         * 渲染标签列表页(首页)
+         */
+        renderTagList: function(data, fn) {
+            var self = this,
+            page = self.buildNewPage();
+            if (!data.list.length) return;
+
+            _wrapper.appendChild(page);
+            setTimeout(function() {
+                indexReqList=[];
+                for (i in data.list) {
+                    self._renderScrollList(data.list[i], page,i);
+                }
+                DA.getIndexScrollData(indexReqList,function(){
+                    self.showNewPage(page,function(){
+                        _curTitle = 0;
+                        self.onScrollMove = function() {
+                            location.href.indexOf("index") > 0 && View.fixListTitle();
+                        }
+                    });
+                });
+                
+            },
+            0);
+            
+        },
+        /**
+         * 渲染水平列表块
+         */
+        _renderScrollList: function(data, page, i) {
+            var self = this,
+            listWrap = doc.createElement("div"),
+            scroll,
+            colViewItem,
+            title,
+            showScroll;
+
+            listWrap.className = "scroll-list";
+            listWrap.innerHTML = '<div class="scroll-title"><h3>' + data.tagName + '</h3><a data-tag="" href="#' + data.listUrl + '_' + encodeURIComponent(data.tagName) + '" class="more"></a></div>\
+            <div class="list-view"><div class="carousel-block"></div></div>';
+            title = listWrap.querySelector(".scroll-title");
+            scroll = listWrap.querySelector(".carousel-block");
+            scroll.listData = data.items;
+            page.appendChild(listWrap);
+            showScroll = function(d){
+                //初始化colview组件
+                colViewItem = new colView({
+                    el: scroll,
+                    scroll: layout.scroll,
+                    data: d.items,
+                    equalHeight: true
+                });
+                //展开打图时显示detail页
+                colViewItem.onSwitchBig = function(obj) {
+                    var url = obj.url;
+                    //处理url地址
+                    url = url.substr(1);
+                    popBigPicWrap = obj.wrap;
+                    Router.setHash(url);
+                };
+            };
+            indexReqList.push({url:Router.getUrl(data.listUrl),fn:showScroll});
+            
+            self.setListTitle(listWrap);
+            return listWrap;
+
+        },
+        /************************************************
+         * 展开列表页面
+         */
+        renderListPage: function(data) {
+            var self = this,
+            page = self.buildNewPage(),
+            listWrap = doc.createElement("ul");
+            listWrap.className = "normal-list";
+            self.curListPage = parseInt(data["currentpage"]);
+            page.innerHTML = '<div class="scroll-title"><h3>' + decodeURIComponent(data.tagName) + '</h3></div>';
+
+            
+            if (!data.items.length) return;
+            _wrapper.appendChild(page);
+            page.appendChild(listWrap);
+            setTimeout(function() {
+                for (var i=0; i< Math.min(data.items.length,Math.max(10,(parseInt((lastListPos/200)+2))*2)); i++) {
+                    self.curListItemNum = i;
+                    self._renderListItem(data.items[i], listWrap);
+                }
+                self.showNewPage(page,
+                function() {
+
+                    self._loadMoreListItem(page,listWrap,data.items);
+                    layout.destroy();
+                    window.scrollTo(0,lastListPos);
+                });
+            },
+            0);
+        },
+        _renderListItem: function(data, wrap) {
+            var self = this,
+            isScroll = false,
+            item = doc.createElement("li"),
+            template = '<a href="#' + data["publishUrl"].substr(1) + '"><img src="' + data["pic"] + "_250x250.jpg" + '"/></a>';
+            item.innerHTML = template,
+            el = item.querySelector("img");
+            function resize(el){
+                var minW = 140,
+                    minH = 190,
+                    pScale = minW/minH,
+                    scale = el.width/el.height,
+                    width = scale>pScale?(scale<1.4*pScale?minH*scale:minW):minW,
+                    height = scale<=pScale?minW/scale:(scale<1.4*pScale?minH:minW/scale);
+                    el.style.cssText = "width:"+width+"px; height:"+height+"px; margin-top:"+((minH-height)/2)+"px; margin-left:"+((minW-width)/2)+"px;";
+                el.onload = function(){
+                    resize(this);
+                }
+            }
+            
+            //发生点击时记录位置
+            item.addEventListener("touchstart",function(){
+                isScroll = false;
+            }); 
+            item.addEventListener("touchend",function(){
+                isScroll = true;
+            }); 
+            item.addEventListener("touchend",function(){
+                if(isScroll)return;
+                lastListPos = doc.body.scrollTop;
+                wrap.parentNode.style.opacity=0;
+            }); 
+            item.addEventListener("click",function(){
+                lastListPos = doc.body.scrollTop;
+                wrap.parentNode.style.opacity=0;
+            });         
+            wrap.appendChild(item);
+            resize(el);
+            
+        },
+        /**
+         * 加载更多列表内容
+         */
+        _loadMoreListItem:function(page,listWrap,items){
+            var self = this;
+            var scroller = _wrapper,
+            scrollTop,
+            loadBox = doc.createElement("div");
+            loadBox.className = "text-loading-box btn-loading-box";
+            loadBox.innerHTML = "点击载入更多";
+            loadBox.addEventListener("click",function(e){
+               loadMore(); 
+            });
+            function loadMore(){
+                if(self.loadingMoreList){
+                    return;
+                }
+                if(self.curListItemNum<items.length-1){
+                    var cur = self.curListItemNum,i;
+                    for(i = cur+1 ; i<Math.min(items.length,cur+11); i++){
+                        self.curListItemNum = i;
+                        self._renderListItem(items[i], listWrap);
+                    }
+                    return;
+                }
+                self.loadingMoreList = true;
+                loadBox.innerHTML = "正在载入更多...";
+                DA.getMoreListContent(function(data){
+                    self.curListPage = parseInt(data["currentpage"]);
+                    self.loadingMoreList = false;
+                    loadBox.innerHTML = "点击载入更多";
+                    // if(loadBox&&loadBox.parentNode){
+                        // loadBox.parentNode.removeChild(loadBox);
+                        // loadBox = null;
+                    // }
+                    for (i in data.items) {
+                        self._renderListItem(data.items[i], listWrap);
+                    }
+                    
+                });
+            }
+            page.appendChild(loadBox);
+            /*self.onScrollMove = function(y){
+                if (layout.scroll) return;
+                if(!self.isLastPage){
+                    scrollTop = y;
+                    if(scroller.clientHeight-scrollTop<(window.innerHeight+20)&&! self.loadingMoreList){
+                        
+                    }
+                }
+            }*/
+            
+            
+            
+        },
+        /**
+         * 上下滚动时将标题固定在顶部
+         */
+        setListTitle: function(el) {
+            if (!layout.scroll) return;
+            var self = this,
+            scroll = layout.scroll,
+            scrollTop, title = el.querySelector(".scroll-title"),
+            pos = scroll._offset(el),
+            elWidth = el.clientWidth,
+            elHeight = el.clientHeight,
+            elTop,
+            cloneTitle = title.cloneNode(true);
+            pos.left += scroll.wrapperOffsetLeft;
+            pos.top += scroll.wrapperOffsetTop;
+            elTop = Math.abs(pos.top);
+
+            listObjArr.push({
+                pos: elTop,
+                obj: cloneTitle
+            });
+        },
+        fixListTitle: function() {
+            if (!layout.scroll) return;
+            var self = this,
+            scroll = layout.scroll,
+            scrollTop, elTop, cloneTitle, nextElTop,prevElTop;
+
+            scrollTop = -scroll.y;
+            elTop = listObjArr[_curTitle].pos;
+            cloneTitle = listObjArr[_curTitle].obj;
+            if (listObjArr[_curTitle - 1]) {
+                prevElTop = listObjArr[_curTitle -1].pos
+                if(scrollTop < prevElTop){
+                    _curTitle--;
+                    _fixTitleWrapper.innerHTML = "";
+                    if(_curTitle!=0)_fixTitleWrapper.appendChild(listObjArr[_curTitle-1].obj);
+                    
+                }
+            }
+            if (listObjArr[_curTitle + 1]) {
+                nextElTop = listObjArr[_curTitle + 1].pos;
+                
+                if (scrollTop >= elTop && scrollTop < nextElTop) {
+                    if (_fixTitleWrapper.firstChild != cloneTitle) {
+                        _fixTitleWrapper.innerHTML = "";
+                        _fixTitleWrapper.appendChild(cloneTitle);
+                        _curTitle++;
+                    }
+                }
+                if(scrollTop < elTop&&Math.abs(scrollTop-elTop)<_fixTitleWrapper.clientHeight){
+                    _fixTitleWrapper.style.webkitTransform="translate3d(0,-"+(_fixTitleWrapper.clientHeight-Math.abs(scrollTop-elTop))+"px,0)";
+                }else{
+                    _fixTitleWrapper.style.webkitTransform="translate3d(0,0,0)";
+                }
+            }
+            if(scrollTop<0){
+               _fixTitleWrapper.innerHTML = "";
+               _curTitle = 0;
+            }
+
+        },
+        /*******************************************************************
+         * 渲染详情页
+         */
+        renderDetailPage: function(data) {
+            if(!data)return;
+
+            var self = this,
+            title = data["title"],
+            contentHTML = data["body"],
+            page = self.buildNewPage(),
+
+            //文章标题和操作区
+            titleWrap = doc.createElement("div"),
+            titleBtn,
+            
+            //图片数据
+            imgArr = self._convHTMLtoList(contentHTML),
+            galleryViewItem,
+            detailWrap = doc.createElement("div"),
+            height = window.innerHeight-48,
+            width = _wrapper.parentNode.clientWidth;
+            self.curDetailPage = parseInt(data["page_current"]),
+            contentWrap = doc.createElement("div");
+            //获取总页数
+            var pagelen = (function() {
+                var pages = data["article_pagination"],
+                i = 0;
+                for (k in pages)
+                i++
+                return i;
+            })();
+            //获取当前页
+            self.curDetailPage = parseInt(data["page_current"]);
+            //判断是不是最后一页
+            if (self.curDetailPage == pagelen) {
+                self.isLastPage = true;
+            } else {
+                self.isLastPage = false;
+            }
+            //将新页面添加到页面中
+            _wrapper.appendChild(page);
+            //设置标题和操作区
+            titleWrap.className = "title-wrap";
+            titleWrap.innerHTML = "<span>" + title + "</span><a href=''><em>图文模式</em><b></b></a>";
+            titleBtn = titleWrap.querySelector("em");
+            titleBtn.addEventListener("click",
+            function(e) {
+                e.preventDefault();
+                self.isImgMode = !self.isImgMode;
+                self._setDetailMode();
+                Router.reload();
+            });
+
+            if (self.isImgMode) {
+                //大图模式初始化
+                //设置detail页容器样式
+                detailWrap.className = "gallery-view-block";
+                detailWrap.style.cssText = "width:" + (width) + "px; height:" + height + "px;overflow: visible !important;";
+                page.appendChild(detailWrap);
+
+                titleBtn.innerHTML = "图文模式";
+
+                //初始化详情页视图
+                galleryViewItem = new galleryView({
+                    wrap: detailWrap,
+                    data: imgArr,
+                    relationList:'<div class="relation-article"><ul><li>相关文章：<a href="#" class="back-to-first">返回第一张大图</a></li>'+data["correlationArticle"].replace(/href='\//ig,"href='#").replace(/_blank/g,"")+'</ul></div>',
+                    isLastPage:self.isLastPage
+                });
+                //拖动载入更多
+                galleryViewItem.loadMore = function() {
+                    self._loadMoreContent(galleryViewItem, imgArr);
+                }
+                //禁用滚动
+                page.ontouchstart = function(e) {
+                    
+                }
+                page.ontouchmove = function(e) {
+                    
+                }
+            } else {
+                //图文模式初始化
+                titleBtn.innerHTML = "大图模式";
+                page.appendChild(contentWrap);
+                contentWrap.className = "text-detail";
+                contentWrap.innerHTML = '<h2>' + data["title"] + '</h2>'
+                contentWrap.innerHTML += data["body"].replace(/\.(jpg|png)/g,function($0){
+                    return $0+"_160x160.jpg";
+                });
+                
+            }
+            //插入页面
+            self.showNewPage(page,
+            function() {
+                //显示标题容器
+                self._removeDetailTitle();
+                doc.querySelector("#wrapper").appendChild(titleWrap);
+                setTimeout(function(){titleWrap.style.webkitTransform = "translate3d(0,0,0)";},0);
+                if(!self.isImgMode)self._loadMoreTextDetailPage(contentWrap);
+
+            });
+            self.isLastPage = false;
+        },
+        _getDetailMode:function(){
+            return userData.get("isImgMode");
+        },
+        _setDetailMode:function(){
+            userData.set("isImgMode",this.isImgMode);
+        },
+        _removeDetailTitle: function() {
+            if (doc.querySelector("#wrapper .title-wrap")) doc.querySelector("#wrapper").removeChild(doc.querySelector("#wrapper .title-wrap"));
+        },
+        /**
+         * 渲染更多文本模式
+         */
+        _loadMoreTextDetailPage: function(contentWrap) {
+            var self = this;
+            self.onScrollMove = function(y){
+                if(!self.isLastPage){
+                    var scroller = _wrapper,
+                    scrollTop = y,
+                    count = 0,
+                    text = "正在载入更多",
+                    interval,
+                    loadBox = doc.createElement("div");
+                    loadBox.className = "text-loading-box";
+                    loadBox.innerHTML = text;
+                    interval = setInterval(function(){
+                        if(loadBox){
+                            loadBox.innerHTML = text;
+                            for(var i=0; i<count%4; i++){
+                                loadBox.innerHTML+=".";
+                            }
+                            count++;
+                        }else{
+                            clearInterval(interval);
+                        }
+                    },400);
+                    if(scroller.clientHeight-scrollTop<(window.innerHeight+20)&&! self.loadingMore){
+                        contentWrap.appendChild(loadBox);
+                        self._loadMoreContent(null,null,contentWrap,function(){
+                            if(loadBox&&loadBox.parentNode){
+                                loadBox.parentNode.removeChild(loadBox);
+                                loadBox = null;
+                            }
+                            setTimeout(function(){scroll.refresh();},2000);
+                            
+                        });
+                    }
+                }
+            }
+        },
+        /**
+         * 将文章内容转成图片数据
+         */
+        _convHTMLtoList: function(HTML, arr) {
+            var self = this,
+            //文章容器
+            fragment = doc.createElement("div"),
+            imgs,
+            imgArr = arr || [];
+            //设置内容
+            fragment.innerHTML = HTML;
+            //获取文章中的列表
+            imgs = fragment.querySelectorAll("img");
+            for (k in imgs) {
+                imgs[k].src && imgArr.push({
+                    img: imgs[k].src
+                });
+
+            }
+            return imgArr;
+        },
+        /**
+         * 加载更多图片(或文字数据)
+         */
+        _loadMoreContent: function(view, olddata, contentWrap,fn) {
+
+            var self = this, html="";
+
+            ! self.loadingMore && DA.getMoreDetailContent(function(data) {
+                if (data) {
+                    //获取总页数
+                    var pagelen = (function() {
+                        var pages = data["article_pagination"],
+                        i = 0;
+                        for (k in pages)
+                        i++
+                        return i;
+                    })();
+                    //获取当前页
+                    self.curDetailPage = parseInt(data["page_current"]);
+                    //判断是不是最后一页
+                    if (self.curDetailPage == pagelen) {
+                        self.isLastPage = true;
+                    } else {
+                        self.isLastPage = false;
+                    }
+                    //关闭正在加载状态
+                    self.loadingMore = false;
+                    //如果是在图片模式
+                    if (self.isImgMode) {
+                        //显示数据
+                        self._convHTMLtoList(data["body"], olddata);
+                        view.updataDataLength(olddata.length);
+                        setTimeout(function() {
+                            if(self.isLastPage){
+                                html = '<ul class="relation-article">'+data["correlationArticle"].replace(/href='\//ig,"href='#").replace("_blank","")+'</ul>';
+                            }
+                            view.goToMore(self.isLastPage,html);
+                        },
+                        200);
+                    }else{
+                        var newTextWrap = doc.createElement("div"),
+                        imgs;
+                        newTextWrap.innerHTML = data["body"].replace(/\.(jpg|png)/g,function($0){
+                            return $0+"_160x160.jpg";
+                        });
+                        imgs = newTextWrap.querySelectorAll("img");
+                        for(var k=0; k<imgs.length; k++){
+                            imgs[k].addEventListener("load",function(){
+                                layout.scroll&&layout.scroll.refresh();
+                            });
+                        }
+                        //更新文本模式html
+                        contentWrap.appendChild(newTextWrap);
+                    }
+                    fn&&fn();
+                }
+            });
+            self.loadingMore = true;
+
+        },
+        
+        /**********************************************************************
+         * 显示正在载入动画
+         */
+        showLoading: function(flag) {
+            if (!canvasInterval) {
+                var tag = loadingCanvas = document.createElement("canvas");
+                var back = doc.createElement("a");
+                var ctx = tag.getContext("2d"),
+                count = 0,
+                edges = 12,
+                i,
+                mask = doc.createElement("div");
+                if(!flag){
+                    back.href = "javascript:history.go(-1)";
+                    back.className = "J_cancleLoading";
+                    back.innerHTML = "取消";
+                    back.style.cssText = "display:none;position:fixed; width:80px; height:40px; line-height:40px; -webkit-border-radius:5px;background:rgba(0,0,0,0.6); color:#fff; font-size:14px; text-align:center;left:"+(window.innerWidth/2-40)+"px;top:"+(window.innerHeight/2+140)+"px;z-index:10000;";
+                    doc.body.appendChild(back);
+                    setTimeout(function(){if(!pageLoaded)back.style.display="block"},4000);
+                }
+                mask.className="J_loadingMask";
+                doc.body.appendChild(tag);
+                doc.body.appendChild(mask);
+                
+                tag.width = 280;
+                tag.height = 180;
+                tag.style.cssText = "position:fixed; top:"+(window.innerHeight/2-60)+"px; left:"+(window.innerWidth/2-140)+"px;-webkit-transform:scale3d(0.5,0.5,1); -webkit-transition:all 0.4s;-webkit-border-radius:15px;z-index:10000; background:rgba(0,0,0,0.7);";
+                mask.style.cssText = "position:fixed; top:0; left:0; width:100%; height:1000px; background:rgba(0,0,0,0.1);z-index:9999;";
+                mask.addEventListener("touchmove",function(e){
+                    e.preventDefault();
+                });
+                function drawItem() {
+                    ctx.save();
+                    ctx.translate(60, tag.height / 2);
+                    ctx.rotate(Math.PI * count / (edges / 2));
+                    count++;
+                    for (i = 0; i < edges; i++) {
+                        var color = (i) / edges;
+                        ctx.fillStyle = "rgba(255,255,255," + color + ")";
+                        ctx.rotate(Math.PI / (edges / 2));
+                        ctx.fillRect( - 2, -20, 4, 10);
+                    }
+
+                    ctx.restore();
+                    ctx.save();
+                    ctx.translate(60, tag.height / 2);
+                    ctx.fillStyle = "rgba(255,255,255,1)";
+                    ctx.font = "32px Arial";
+                    ctx.fillText("载入中...", 40, 10);
+                    ctx.restore();
+
+                }
+
+                drawItem();
+                canvasInterval = setInterval(function() {
+                    ctx.clearRect(0, 0, 280, 180);
+                    drawItem();
+                },
+                120);
+            }
+        },
+        /**
+         * 隐藏载入中动画
+         */
+        hideLoading: function(fn) {
+            var mask = doc.querySelector(".J_loadingMask"),
+            back = doc.querySelector(".J_cancleLoading");
+            if(back){
+                back.parentNode.removeChild(back);
+                back = null;
+            }
+            pageLoaded  = true;
+            if (loadingCanvas) {
+                loadingCanvas.style.opacity = 0;
+                loadingCanvas.style.webkitTransform = "scale3d(1,1,1)";
+                
+                loadingCanvas.addEventListener("webkitTransitionEnd",
+                function() {
+                    try {
+                        clearInterval(canvasInterval);
+                        canvasInterval = null;
+                        loadingCanvas.parentNode.removeChild(loadingCanvas);
+                        if(mask){
+                            mask.parentNode.removeChild(mask);
+                            mask = null;
+                        }
+                        
+                        loadingCanvas = null;
+                        fn && fn();
+                    } catch(e) {}
+                });
+            }
+        }
+    }
+})();
+
+</script>
+<script>
+Control = (function() {
+    var doc = document, DA = dataAccess, requestUrl;
+    return {
+        indexAction : function(params) {
+            var id = params[1];
+            //设置首页数据请求地址
+            switch(id) {
+                case "1":
+                    requestUrl = "http://www.taobao.com/go/chn/minfo/danpin.php";
+                    userData.set("index","index/"+1);
+                    break;
+                case "2":
+                    requestUrl = "http://www.taobao.com/go/chn/minfo/dapei.php";
+                    userData.set("index","index/"+2);
+                    break;
+                default:
+                    return false;
+                    break;
+            }
+            View.setHeadStatus(id);
+            //获取数据并开始渲染
+            DA.getIndexData(requestUrl);
+        },
+
+        detailAction : function(params) {
+            requestUrl = "http://it.taobao.com/" + params.join("/") + "?tpl=minfo"
+            View.setHeadStatus("detail");
+            //获取数据并开始渲染
+            DA.getDetailData(requestUrl);
+        },
+
+        listAction : function(params) {
+            var tag = params.pop().split("_");
+            requestUrl = "http://it.taobao.com/" + params.join("/") + "/" + tag[0] + "?tpl=minfo";
+            View.setHeadStatus("list");
+            //获取数据开始渲染
+            DA.getListData(requestUrl, tag[1]);
+        }
+
+    }
+})();
+
+</script>
+<script>
+Router = (function(){
+	var doc = document, 
+	loc = location,
+	//存储当前参数数组
+	curParam,
+	//路由配置
+	cfg = {
+		"index":"indexAction",
+		"list":"listAction",
+		"tag":"listAction",
+		"detail":"detailAction"
+	};
+	
+	function _getParam(){
+		var str = loc.hash.substr(1),
+		params = str.split("/");
+		_gaq.push(['_trackPageview',str]);
+		return params;
+	}
+	
+	return {
+		init:function(){
+			var self = this,
+			params = _getParam();
+			this.oldHash = "#"+userData.get("index");
+			//todo:记录用户状态，设置默认的类目
+			self.curHash = loc.hash;
+			window.onhashchange = function(e){
+				self.oldHash = self.curHash;
+				self.handleParams();
+				self.curHash = loc.hash;
+			}
+			// alert("");
+			// if(!"onhashchange" in window){
+			    // alert("");
+			    // self.curHash = loc.hash;
+			    // setInterval(function(){
+			        // if(self.curHash!=loc.hash){
+			            // self.oldHash = "#"+self.curHash.split("#")[1];
+                        // self.handleParams();
+                        // self.curHash = loc.hash;
+			        // }
+			    // },100);
+			// }
+			if(params.length<=1){
+				self.setHash(userData.get("index"));
+			}else{
+				self.handleParams();
+			}
+		},
+		handleParams:function(){
+			var self = this,
+			params = _getParam();
+			if(params.length<=1){
+				self.setHash(userData.get("index"));
+			}
+			Control[cfg[params[0]]](params);
+			//初始化提示
+			TipShow.init();
+		},
+		setHash:function(str){
+			this.oldHash = loc.hash;
+			loc.hash="#"+str;
+		},
+		reload:function(){
+			var self = this;
+			self.handleParams();
+		},
+		getUrl:function(url){
+		    return "http://it.taobao.com/"+url+"?tpl=minfo";
+		},
+		getNewDetailPage:function(){
+			var hash = loc.hash, 
+			params = _getParam(),
+			len = params.length;
+			params[len-1] = View.curDetailPage+1+".php";
+			return "http://it.taobao.com/"+params.join("/")+"?tpl=minfo";
+			
+		},
+		getNewListPage:function(){
+            var hash = loc.hash, 
+            params = _getParam(),
+            len = params.length;
+            params[len-1] = View.curListPage+1+".php";
+            return "http://it.taobao.com/"+params.join("/")+"?tpl=minfo";
+            
+        }
+	}
+})();
+var addToHomeConfig = {
+    autostart: false,
+    returningVisitor:true
+};
+var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-30637075-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+function _main(){
+
+      
+	window.addEventListener("load",function(){
+	    if(location.hash.match("index")){
+	        addToHome.show();
+	    }
+	    
+	    window.applicationCache.addEventListener("updateready", function(e) {
+
+        　　if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+        
+            　　// Browser downloaded a new app cache.
+            
+            　　// Swap it in and reload the page to get the new hotness.
+            
+        　    　window.applicationCache.swapCache();
+                window.location.reload();
+        
+        　　} else {
+        
+        　　// Manifest didn’t changed. Nothing new to server.
+        
+        　　}
+        
+        　　}, false);
+	    userData.init();
+		View.init();
+		Router.init();
+		
+	})
+	
+}
+
+</script>
+<script>
+/*!
+ * SwipeView v0.10 ~ Copyright (c) 2011 Matteo Spinelli, http://cubiq.org
+ * Released under MIT license, http://cubiq.org/license
+ */
+var SwipeView = (function(){
+	var hasTouch = 'ontouchstart' in window,
+		resizeEvent = 'onorientationchange' in window ? 'orientationchange' : 'resize',
+		startEvent = hasTouch ? 'touchstart' : 'mousedown',
+		moveEvent = hasTouch ? 'touchmove' : 'mousemove',
+		endEvent = hasTouch ? 'touchend' : 'mouseup',
+		cancelEvent = hasTouch ? 'touchcancel' : 'mouseup',
+		
+		SwipeView = function (el, options) {
+			var i,
+				div,
+				className,
+				pageIndex;
+
+			this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
+			this.options = {
+				text: null,
+				numberOfPages: 3,
+				snapThreshold: null,
+				hastyPageFlip: false,
+				loop: true
+			}
+		
+			// User defined options
+			for (i in options) this.options[i] = options[i];
+			
+			this.wrapper.style.overflow = 'hidden';
+			this.wrapper.style.position = 'relative';
+			
+			this.masterPages = [];
+			
+			div = document.createElement('div');
+			div.className = 'swipeview-slider';
+			div.style.cssText = 'position:relative;top:0;height:100%;width:100%;-webkit-transition-duration:0;-webkit-transform:translate3d(0,0,0);-webkit-transition-timining-function:ease-out';
+			this.wrapper.appendChild(div);
+			this.slider = div;
+
+			this.refreshSize();
+
+			for (i=-1; i<2; i++) {
+				div = document.createElement('div');
+				div.id = 'swipeview-masterpage-' + (i+1);
+				div.style.cssText = '-webkit-transform:translateZ(0);position:absolute;top:0;height:100%;width:100%;left:' + i*100 + '%';
+				if (!div.dataset) div.dataset = {};
+				pageIndex = i == -1 ? this.options.numberOfPages - 1 : i;
+				div.dataset.pageIndex = pageIndex;
+				div.dataset.upcomingPageIndex = pageIndex;
+				
+				if (!this.options.loop && i == -1) div.style.visibility = 'hidden';
+
+				this.slider.appendChild(div);
+				this.masterPages.push(div);
+			}
+			
+			className = this.masterPages[1].className;
+			this.masterPages[1].className = !className ? 'swipeview-active' : className + ' swipeview-active';
+
+			window.addEventListener(resizeEvent, this, false);
+			this.wrapper.addEventListener(startEvent, this, false);
+			this.wrapper.addEventListener(moveEvent, this, false);
+			this.wrapper.addEventListener(endEvent, this, false);
+			this.slider.addEventListener('webkitTransitionEnd', this, false);
+
+/*			if (!hasTouch) {
+				this.wrapper.addEventListener('mouseout', this, false);
+			}*/
+		};
+	
+	SwipeView.prototype = {
+		currentMasterPage: 1,
+		x: 0,
+		page: 0,
+		pageIndex: 0,
+		customEvents: [],
+		isLoading:false,
+		
+		onFlip: function (fn) {
+			this.wrapper.addEventListener('swipeview-flip', fn, false);
+			this.customEvents.push(['flip', fn]);
+		},
+		
+		onMoveOut: function (fn) {
+			this.wrapper.addEventListener('swipeview-moveout', fn, false);
+			this.customEvents.push(['moveout', fn]);
+		},
+
+		onMoveIn: function (fn) {
+			this.wrapper.addEventListener('swipeview-movein', fn, false);
+			this.customEvents.push(['movein', fn]);
+		},
+		
+		onTouchStart: function (fn) {
+			this.wrapper.addEventListener('swipeview-touchstart', fn, false);
+			this.customEvents.push(['touchstart', fn]);
+		},
+        
+        onMaxMove:function(){},
+        
+		destroy: function () {
+			var i, l;
+			for (i=0, l=this.customEvents.length; i<l; i++) {
+				this.wrapper.removeEventListener('swipeview-' + this.customEvents[i][0], this.customEvents[i][1], false);
+			}
+			
+			this.customEvents = [];
+			
+			// Remove the event listeners
+			window.removeEventListener(resizeEvent, this, false);
+			this.wrapper.removeEventListener(startEvent, this, false);
+			this.wrapper.removeEventListener(moveEvent, this, false);
+			this.wrapper.removeEventListener(endEvent, this, false);
+			this.slider.removeEventListener('webkitTransitionEnd', this, false);
+
+/*			if (!hasTouch) {
+				this.wrapper.removeEventListener('mouseout', this, false);
+			}*/
+		},
+
+		refreshSize: function () {
+			this.wrapperWidth = this.wrapper.clientWidth;
+			this.wrapperHeight = this.wrapper.clientHeight;
+			this.pageWidth = this.wrapperWidth;
+			this.maxX = -this.options.numberOfPages * this.pageWidth + this.wrapperWidth;
+			this.snapThreshold = this.options.snapThreshold === null
+				? Math.round(this.pageWidth * .15)
+				: /%/.test(this.options.snapThreshold)
+					? Math.round(this.pageWidth * this.options.snapThreshold.replace('%', '') / 100)
+					: this.options.snapThreshold;
+		},
+		
+		updatePageCount: function (n) {
+			this.options.numberOfPages = n;
+			this.maxX = -this.options.numberOfPages * this.pageWidth + this.wrapperWidth;
+		},
+		
+		goToPage: function (p) {
+			var i, offset;
+
+			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
+			for (i=0; i<3; i++) {
+				className = this.masterPages[i].className;
+				/(^|\s)swipeview-loading(\s|$)/.test(className) || (this.masterPages[i].className = !className ? 'swipeview-loading' : className + ' swipeview-loading');
+			}
+			
+			p = p < 0 ? 0 : p > this.options.numberOfPages-1 ? this.options.numberOfPages-1 : p;
+			offset = Math.abs(this.page-p);
+			this.page = p;
+			this.pageIndex = p;
+			if(offset>2){
+				this.slider.style.webkitTransitionDuration = '0';
+			}else{
+				this.slider.style.webkitTransitionDuration = "300ms";
+			}
+			this.__pos(-p * this.pageWidth);
+
+			this.currentMasterPage = (this.page + 1) - Math.floor((this.page + 1) / 3) * 3;
+
+			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className + ' swipeview-active';
+
+			if (this.currentMasterPage == 0) {
+				this.masterPages[2].style.left = this.page * 100 - 100 + '%';
+				this.masterPages[0].style.left = this.page * 100 + '%';
+				this.masterPages[1].style.left = this.page * 100 + 100 + '%';
+				
+				this.masterPages[2].dataset.upcomingPageIndex = this.page == 0 ? this.options.numberOfPages-1 : this.page - 1;
+				this.masterPages[0].dataset.upcomingPageIndex = this.page;
+				this.masterPages[1].dataset.upcomingPageIndex = this.page == this.options.numberOfPages-1 ? 0 : this.page + 1;
+				
+			} else if (this.currentMasterPage == 1) {
+				this.masterPages[0].style.left = this.page * 100 - 100 + '%';
+				this.masterPages[1].style.left = this.page * 100 + '%';
+				this.masterPages[2].style.left = this.page * 100 + 100 + '%';
+
+				this.masterPages[0].dataset.upcomingPageIndex = this.page == 0 ? this.options.numberOfPages-1 : this.page - 1;
+				this.masterPages[1].dataset.upcomingPageIndex = this.page;
+				this.masterPages[2].dataset.upcomingPageIndex = this.page == this.options.numberOfPages-1 ? 0 : this.page + 1;
+			} else {
+				this.masterPages[1].style.left = this.page * 100 - 100 + '%';
+				this.masterPages[2].style.left = this.page * 100 + '%';
+				this.masterPages[0].style.left = this.page * 100 + 100 + '%';
+
+				this.masterPages[1].dataset.upcomingPageIndex = this.page == 0 ? this.options.numberOfPages-1 : this.page - 1;
+				this.masterPages[2].dataset.upcomingPageIndex = this.page;
+				this.masterPages[0].dataset.upcomingPageIndex = this.page == this.options.numberOfPages-1 ? 0 : this.page + 1;
+			}
+			// Hide the next page if we decided to disable looping
+            if (!this.options.loop) {
+                var next = this.currentMasterPage==2?0:this.currentMasterPage+1,
+                prev = this.currentMasterPage==0?2:this.currentMasterPage-1;
+                this.masterPages[next].style.visibility = this.options.numberOfPages-1==this.page ? 'hidden' : '';
+                this.masterPages[prev].style.visibility = 0==this.page ? 'hidden' : '';
+            }
+			this.__flip();
+		},
+		
+		next: function () {
+			if (!this.options.loop && this.x == this.maxX) return;
+			
+			this.directionX = -1;
+			this.x -= 1;
+			this.__checkPosition();
+		},
+
+		prev: function () {
+			if (!this.options.loop && this.x == 0) return;
+
+			this.directionX = 1;
+			this.x += 1;
+			this.__checkPosition();
+		},
+
+		handleEvent: function (e) {
+			switch (e.type) {
+				case startEvent:
+					this.__start(e);
+					break;
+				case moveEvent:
+					this.__move(e);
+					break;
+				case cancelEvent:
+				case endEvent:
+					this.__end(e);
+					break;
+				case resizeEvent:
+				 	this.__resize();
+					break;
+				case 'webkitTransitionEnd':
+					if (e.target == this.slider && !this.options.hastyPageFlip) this.__flip();
+					this.isLoading = false;
+					break;
+			}
+		},
+
+
+		/**
+		 *
+		 * Pseudo private methods
+		 *
+		 */
+		__pos: function (x) {
+			this.x = x;
+			this.slider.style.webkitTransform = 'translate3d(' + x + 'px,0,0)';
+		},
+
+		__resize: function () {
+			this.refreshSize();
+			this.slider.style.webkitTransitionDuration = '0';
+			this.__pos(-this.page * this.pageWidth);
+		},
+
+		__start: function (e) {
+			//e.preventDefault();
+
+			if (this.initiated) return;
+			
+			var point = hasTouch ? e.touches[0] : e;
+			
+			this.initiated = true;
+			this.moved = false;
+			this.thresholdExceeded = false;
+			this.startX = point.pageX;
+			this.startY = point.pageY;
+			this.pointX = point.pageX;
+			this.pointY = point.pageY;
+			this.stepsX = 0;
+			this.stepsY = 0;
+			this.directionX = 0;
+			this.directionLocked = false;
+			
+/*			var matrix = getComputedStyle(this.slider, null).webkitTransform.replace(/[^0-9-.,]/g, '').split(',');
+			this.x = matrix[4] * 1;*/
+
+			this.slider.style.webkitTransitionDuration = '0';
+			
+			this.__event('touchstart');
+		},
+		
+		__move: function (e) {
+			if (!this.initiated) return;
+			if (this.isLoading) return;
+			var point = hasTouch ? e.touches[0] : e,
+				deltaX = point.pageX - this.pointX,
+				deltaY = point.pageY - this.pointY,
+				newX = this.x + deltaX,
+				dist = Math.abs(point.pageX - this.startX);
+
+			this.moved = true;
+			this.pointX = point.pageX;
+			this.pointY = point.pageY;
+			this.directionX = deltaX > 0 ? 1 : deltaX < 0 ? -1 : 0;
+			this.stepsX += Math.abs(deltaX);
+			this.stepsY += Math.abs(deltaY);
+
+			// We take a 10px buffer to figure out the direction of the swipe
+			if (this.stepsX < 10 && this.stepsY < 10) {
+//				e.preventDefault();
+				return;
+			}
+
+			// We are scrolling vertically, so skip SwipeView and give the control back to the browser
+			if (!this.directionLocked && this.stepsY > this.stepsX) {
+				this.initiated = false;
+				return;
+			}
+
+			e.preventDefault();
+
+			this.directionLocked = true;
+
+			if (!this.options.loop && (newX > 0 || newX < this.maxX)) {
+				newX = this.x + (deltaX / 2);
+				
+			}
+
+			if (!this.thresholdExceeded && dist >= this.snapThreshold) {
+				this.thresholdExceeded = true;
+				this.__event('moveout');
+			} else if (this.thresholdExceeded && dist < this.snapThreshold) {
+				this.thresholdExceeded = false;
+				this.__event('movein');
+			}
+			
+/*			if (newX > 0 || newX < this.maxX) {
+				newX = this.x + (deltaX / 2);
+			}*/
+			
+			this.__pos(newX);
+		},
+		
+		__end: function (e) {
+			if (!this.initiated) return;
+			
+			var point = hasTouch ? e.changedTouches[0] : e,
+				dist = Math.abs(point.pageX - this.startX),
+				overFlowX;
+
+			this.initiated = false;
+			
+			if (!this.moved) return;
+
+			if (!this.options.loop && (this.x > 0 || this.x < this.maxX)) {
+				dist = 0;
+				this.__event('movein');
+			}
+			if(this.x<this.maxX){
+				overFlowX = this.onMaxMove(this.x-this.maxX);
+			    if(overFlowX){
+			        this.slider.style.webkitTransitionDuration = '200ms';
+			        this.__pos(this.maxX+overFlowX);
+			        return;
+			    };
+			}
+			// Check if we exceeded the snap threshold
+			if (dist < this.snapThreshold) {
+				this.slider.style.webkitTransitionDuration = '200ms';
+				this.__pos(-this.page * this.pageWidth);
+				return;
+			}
+			if (dist > this.pageWidth) {
+				this.slider.style.webkitTransitionDuration = '200ms';
+				this.x = -this.page * this.pageWidth+this.directionX*(this.snapThreshold+10);
+			}
+			
+			
+
+			this.__checkPosition();
+			this.isLoading = true;
+		},
+		
+		__checkPosition: function () {
+			var pageFlip,
+				pageFlipIndex,
+				className;
+
+			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
+
+			// Flip the page
+			if (this.directionX > 0) {
+				
+				this.page = -Math.ceil(this.x / this.pageWidth);
+				
+				this.currentMasterPage = (this.page + 1) - Math.floor((this.page + 1) / 3) * 3;
+				this.pageIndex = this.pageIndex == 0 ? this.options.numberOfPages - 1 : this.pageIndex - 1;
+
+				pageFlip = this.currentMasterPage - 1;
+				pageFlip = pageFlip < 0 ? 2 : pageFlip;
+				this.masterPages[pageFlip].style.left = this.page * 100 - 100 + '%';
+
+				pageFlipIndex = this.page - 1;
+			} else {
+				this.page = -Math.floor(this.x / this.pageWidth);
+				this.currentMasterPage = (this.page + 1) - Math.floor((this.page + 1) / 3) * 3;
+				this.pageIndex = this.pageIndex == this.options.numberOfPages - 1 ? 0 : this.pageIndex + 1;
+
+				pageFlip = this.currentMasterPage + 1;
+				pageFlip = pageFlip > 2 ? 0 : pageFlip;
+				this.masterPages[pageFlip].style.left = this.page * 100 + 100 + '%';
+
+				pageFlipIndex = this.page + 1;
+			}
+
+			// Add active class to current page
+			className = this.masterPages[this.currentMasterPage].className;
+			/(^|\s)swipeview-active(\s|$)/.test(className) || (this.masterPages[this.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
+
+			// Add loading class to flipped page
+			className = this.masterPages[pageFlip].className;
+			/(^|\s)swipeview-loading(\s|$)/.test(className) || (this.masterPages[pageFlip].className = !className ? 'swipeview-loading' : className + ' swipeview-loading');
+			
+			pageFlipIndex = pageFlipIndex - Math.floor(pageFlipIndex / this.options.numberOfPages) * this.options.numberOfPages;
+			this.masterPages[pageFlip].dataset.upcomingPageIndex = pageFlipIndex;		// Index to be loaded in the newly flipped page
+
+			this.slider.style.webkitTransitionDuration = '300ms';
+			
+			newX = -this.page * this.pageWidth;
+
+			// Hide the next page if we decided to disable looping
+			if (!this.options.loop) {
+				this.masterPages[pageFlip].style.visibility = newX == 0 || newX == this.maxX ? 'hidden' : '';
+			}
+
+			if (this.x == newX) {
+				this.__flip();		// If we swiped all the way long to the next page (extremely rare but still)
+			} else {
+				this.__pos(newX);
+				if (this.options.hastyPageFlip) this.__flip();
+			}
+		},
+		
+		__flip: function () {
+			this.__event('flip');
+
+			for (var i=0; i<3; i++) {
+				this.masterPages[i].className = this.masterPages[i].className.replace(/(^|\s)swipeview-loading(\s|$)/, '');		// Remove the loading class
+				this.masterPages[i].dataset.pageIndex = this.masterPages[i].dataset.upcomingPageIndex;
+			}
+		},
+		
+		__event: function (type) {
+			var ev = document.createEvent("Event");
+			
+			ev.initEvent('swipeview-' + type, true, true);
+
+			this.wrapper.dispatchEvent(ev);
+		}
+	};
+
+	return SwipeView;
+})();
+
+</script>
+<script>
+/**
+ * 展示文章中的照片
+ */
+(function(){
+	colView = function(config){
+		this.picData = config.data;
+		this.wrapperEl = config.el;
+		this.step = config.step||2;
+		this.swipe = null;
+		this._buildSwipe();
+		this.scroll = config.scroll;
+		
+	}
+	colView.prototype={
+		constructor:colView,
+		/**
+		 * 使用swipeview初始化
+		 */
+		_buildSwipe:function(){
+			var self = this,
+			len = Math.ceil(this.picData.length/self.step),
+			page, 
+			slides = self.picData;
+			if (this.picData.length) {
+				var gallery = self.swipe = new SwipeView(this.wrapperEl, {
+					numberOfPages: len,
+					loop:false
+				});
+				for (i=0; i<3; i++) {
+					
+					page = i==0 ? len-1 : i-1;
+					el = self._buildCol(page);
+					gallery.masterPages[i].appendChild(el);
+				}
+				gallery.onFlip(function () {
+					var el,
+						upcoming,
+						i;
+				
+					for (i=0; i<3; i++) {
+						upcoming = gallery.masterPages[i].dataset.upcomingPageIndex;
+						if (upcoming != gallery.masterPages[i].dataset.pageIndex) {
+							el = gallery.masterPages[i].querySelector('.col');
+							gallery.masterPages[i].removeChild(el);
+							gallery.masterPages[i].appendChild(self._buildCol(upcoming));
+						}
+					}
+				});
+				
+				gallery.onMoveOut(function () {
+					gallery.masterPages[gallery.currentMasterPage].className = 
+					gallery.masterPages[gallery.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
+				});
+				
+				gallery.onMoveIn(function () {
+					var className = gallery.masterPages[gallery.currentMasterPage].className;
+					/(^|\s)swipeview-active(\s|$)/.test(className) || 
+					(gallery.masterPages[gallery.currentMasterPage].className = 
+						!className ? 'swipeview-active' : className + ' swipeview-active');
+				});
+			}
+		},
+		/**
+		 * 向masterPage中添加两个item
+		 */
+		_buildCol:function(i){
+			var self = this, 
+			el = document.createElement("div"),
+			item;
+			el.className = "col"
+			for(var k = 0; k<self.step; k++){
+				item = self._buildItem(i*self.step+k,el);
+				if(item)el.appendChild(item);
+			}
+			return el;
+		},
+		/**
+		 * 创建单个item
+		 */
+		_buildItem:function(i,par){
+			var el,page,
+			self = this,
+			slides = self.picData;
+			//如果当前index有数据
+			if(slides[i]){
+				var img = document.createElement("img"),
+				span = document.createElement("div");
+				span.className = "swipeview-box";
+				span.appendChild(img),
+				isShow = true;
+				
+				el = img;
+				el.style.webkitTransform="translate3d(0,0,0)";
+				self._showLoading(span);
+				el.src = slides[i].pic+"_250x250.jpg";
+				function setImg(){
+				    var minW = span.clientWidth,
+                    minH = span.clientHeight,
+                    pScale = minW/minH,
+                    scale = el.width/el.height,
+                    width = scale>pScale?(scale<1.4*pScale?minH*scale:minW):minW,
+                    height = scale<=pScale?minW/scale:(scale<1.4*pScale?minH:minW/scale);
+                    el.style.cssText = "width:"+width+"px; height:"+height+"px; margin-top:"+((minH-height)/2)+"px; margin-left:"+((minW-width)/2)+"px;";
+                    self._hideLoading(span);
+				}
+				
+				el.onload = function () { 
+					setImg();
+				}
+				el.onerror = function () { 
+					self._hideLoading(span);
+	
+				}
+				
+				if(el.width&&el.height){
+                    setTimeout(function(){setImg();},10);
+                }
+				span.addEventListener("touchmove",function(e){
+					isShow = false;
+				},false);
+				span.addEventListener("touchend",function(e){
+					if(isShow){
+						e.preventDefault();
+						self.onSwitchBig({wrap:null,img:null,url:data.url});
+						//self._switchBig(this,slides[i]);
+					}else{
+						isShow = true;
+					}
+				},false);
+				span.addEventListener("click",function(e){
+					if(isShow){
+						e.preventDefault();
+						self.onSwitchBig({wrap:null,img:null,url:slides[i].publishUrl});
+						//self._switchBig(this,slides[i]);
+					}else{
+						isShow = true;
+					}
+				},false);
+				return span;
+			}else {
+				return false;
+			}
+		},
+		/**
+		 * 显示正在载入动画
+		 */
+		_showLoading:function(obj){
+			var self = this;
+			if(obj.getElementsByTagName("canvas").length!=0){
+				return;
+			}
+			var tag = document.createElement("canvas"),
+					ctx = tag.getContext("2d"),
+					count = 0,
+					edges = 10,
+					i;
+			obj.appendChild(tag);
+			tag.width = 30;
+			tag.height = 30;
+			obj.style.position="relative";
+			tag.style.cssText = "position:absolute; top:50%; left:50%; margin:-15px 0 0 -15px; -webkit-transition:all 0.5s; background:rgba(0,0,0,0.7); -webkit-border-radius:5px;";
+			function drawItem(){
+				ctx.save();
+				ctx.translate(tag.width/2,tag.height/2);
+				ctx.rotate(Math.PI*count/(edges/2));
+				count++;
+				for(i=0; i<edges; i++){
+					var color = (i)/edges;
+					ctx.fillStyle = "rgba(255,255,255,"+color+")";
+					ctx.rotate(Math.PI/(edges/2));
+					ctx.fillRect(-1,-10,2,5);
+				} 
+				ctx.restore();
+			}
+			drawItem();
+			
+		},
+
+        /**
+         * 隐藏正在载入动画
+         */
+        _hideLoading:function(obj){
+            if(obj.getElementsByTagName("canvas").length==0){
+                return;
+            }
+            var self = this,
+            canvas = obj.getElementsByTagName("canvas")[0];
+            canvas.style.opacity=0;
+            setTimeout(function(){
+                clearInterval(self.canvasInterval);
+                try{obj.removeChild(canvas);}catch(e){}
+            },1000)
+            
+        },
+        
+        
+		/**
+		 * 切换到大图
+		 */
+		_switchBig:function(item,data){
+			var self = this,
+			
+			
+			item = item,
+			cloneItem = item.cloneNode(true),
+			img = cloneItem.querySelector("img"),
+			
+			hasScroll = !!self.scroll,
+			docScroll = document.body.scrollTop,
+			itemPos = self._getStartPos(item),
+			
+			
+			//childs = item.parentNode.children,
+			outerWrapper = self.scroll?self.scroll.wrapper:document.body,
+			//为弹出图片添加一个遮罩层容器
+			newWrap = document.createElement("div"),
+			//遮罩层容器类名
+			newWrapCls = "popBigPicWrap";
+			if(document.querySelector("."+newWrapCls)){
+				return;
+			}
+			newWrap.className = newWrapCls;
+			if(!hasScroll){
+				newWrap.style.top = docScroll+"px"
+			}
+			//设置浮出图片的初始位置和样式
+			cloneItem.style.position = "absolute";
+			
+			//由于border等影响，会有几像素的偏差，后期需要调整
+			cloneItem.style.top = itemPos["top"]+5-docScroll+"px";
+			cloneItem.style.left = itemPos["left"]-5+"px";
+			
+			cloneItem.style.zIndex = "100";
+			cloneItem.style.webkitTransition = "all 0.3s ease-in-out";
+			
+			//隐藏原始图片
+			item.style.opacity = 0;
+			
+			outerWrapper.appendChild(newWrap);
+			newWrap.appendChild(cloneItem);
+			
+			//设置图片的最终状态，动画由transition完成
+			setTimeout(function(){
+				//img.style.webkitTransform="translate3d(0,0,0)";
+				
+				cloneItem.style.top = (newWrap.clientHeight-340)/2+"px";
+				cloneItem.style.left = itemPos["outerLeft"]+3+"px";
+				cloneItem.style.width = "280px";
+				cloneItem.style.height = "340px";
+				//旋转效果
+				//cloneItem.style.webkitTransform = 'rotateY(180deg) scaleX('+(280/cloneItem.clientWidth)+') scaleY('+(360/cloneItem.clientHeight)+')';
+				img.style.webkitTransformStyle = "preserve-3d"
+				cloneItem.style.webkitTransformStyle = "preserve-3d";
+				
+				//动画进行到一半时绑定事件并切换到大图
+				var newImg = new Image();
+				self.onSwitchBig({wrap:newWrap,img:newImg,url:data.url});
+				setTimeout(function(){
+					
+					newImg.onload = function(){
+						img.src = this.src;
+					}
+					newImg.src = img.src.replace(/_[^\.]*\.jpg$/,"_310x310.jpg");
+					//做3d变换时将图片翻转
+					//img.style.webkitTransform = 'rotateY(180deg)';
+					
+					//绑定取消动作
+					newWrap.addEventListener("touchend",function(){
+						this.parentNode.removeChild(this);
+						item.style.opacity = 1;
+					},false);
+					
+					newWrap.addEventListener("touchmove",function(e){
+						e.preventDefault();
+					},false);
+					
+				},300);
+			},0);
+			
+			
+		},
+		onSwitchBig:function(){},
+		/**
+		 * 获取要放大的元素的初始位置（相对滚动容器）
+		 */
+		_getStartPos:function(item){
+			var self = this,
+			
+			//如果没有使用iscroll则取相对body的位置
+			scrollTop = self.scroll?self.scroll.y:document.documentElement.scrollTop,
+			outerWrapper = self.scroll?self.scroll.wrapper:document.body,
+			wrap = self.swipe.wrapper,
+			offsetTop,offsetLeft;
+			function getOffsetTop(obj,offset){
+				var parNode = obj.offsetParent;
+				offset = offset+obj.offsetTop;
+				
+				if(parNode!=outerWrapper){
+					return getOffsetTop(parNode,offset);
+				}else{
+					return offset-Math.abs(scrollTop);
+				}
+			}
+			function getOffsetLeft(obj,offset){
+				var parNode = obj.offsetParent;
+				offset = obj.offsetLeft;
+				
+				if(parNode!=wrap){
+					return getOffsetLeft(parNode,offset);
+				}else{
+					return offset+wrap;
+				}
+			}
+			offsetTop = getOffsetTop(wrap,0);
+			offsetLeft = item.offsetLeft+wrap.offsetLeft;
+			//返回当前元素的top,left,和外部容器的left
+			return {
+				top:offsetTop,
+				left:offsetLeft,
+				outerLeft:wrap.offsetLeft
+			};
+		},
+		/**
+		 * 销毁实例
+		 */
+		destroy:function(){
+			var self = this;
+			self.swipe.destroy();
+		}
+	}
+	
+})();
+
+</script>
+<script>
+/**
+ * 展示文章中的照片
+ */
+(function(){
+	galleryView = function(config){
+		this.picData = config.data;
+		this.wrap = config.wrap;
+		this.swipe = null;
+		this.relationList = config.relationList;
+		this.isLastPage = config.isLastPage;
+		this.relationItem;
+		this._buildSwipe();
+	}
+	galleryView.prototype={
+		constructor:galleryView,
+		_buildSwipe:function(){
+			var self = this,
+			page, 
+			slides = self.picData,
+			endPosition,
+			loadBlock;
+			if (this.picData.length) {
+				var gallery = self.swipe = new SwipeView(this.wrap, {
+					numberOfPages: this.picData.length,
+					loop:false
+				});
+				window.addEventListener("resize",function(){
+				    if(gallery&&gallery.refreshSize){
+				        setTimeout(function(){
+                            for (i=0; i<3; i++) {
+                                var img = gallery.masterPages[i].querySelector("img");
+                                img.style.marginLeft = -img.clientWidth/2+"px";
+                                img.style.marginTop = -img.clientHeight/2+"px";   
+
+                            }
+                        },30);
+				        
+				    }
+				});
+				for (i=0; i<3; i++) {
+					page = i==0 ? slides.length-1 : i-1;
+					if(slides[page]){
+        				el = self._buildItem(page);
+        				gallery.masterPages[i].appendChild(el);
+					}else if(self.isLastPage&&!document.querySelector(".relation-article")){
+					    gallery.masterPages[i].innerHTML = self.relationList;
+					    self._buildRelationIscroll();
+					}
+				}
+				//预处理后面的图片，如果是小图，则删除该数据
+                self._preLoadPics();
+				if(!self.loadBlock){
+                    endPosition = (gallery.options.numberOfPages)*gallery.pageWidth;
+                    self.loadBlock = loadBlock = document.createElement("div");
+                    gallery.slider.appendChild(loadBlock);
+                    loadBlock.className = "will-loading-more";
+                    loadBlock.style.cssText = "-webkit-transform:translate3d("+endPosition+"px,0,0)";
+                    loadBlock.innerHTML = "";  
+                }
+				gallery.onFlip(function () {
+					var el,
+						upcoming,
+						i;
+				
+					for (i=0; i<3; i++) {
+						try{
+							upcoming = gallery.masterPages[i].dataset.upcomingPageIndex;
+							if (upcoming != gallery.masterPages[i].dataset.pageIndex||!gallery.masterPages[i].querySelector('.swipeview-box')) {
+							    if(slides[upcoming]&&!(!self.relationListShow&&upcoming==0)){
+    								gallery.masterPages[i].innerHTML="";
+    								el = self._buildItem(upcoming);
+    								gallery.masterPages[i].appendChild(el);
+								}else if(View.isLastPage&&!document.querySelector(".relation-article")){
+								    self.relationListShow = true;
+								    self.updataDataLength(slides.length+1);
+								    gallery.masterPages[i].dataset.upcomingPageIndex = slides.length;
+								    gallery.masterPages[i].innerHTML = self.relationList;
+								    gallery.masterPages[i].style.visibility = "visible";
+								    self._buildRelationIscroll();
+								}
+							}
+						}catch(e){}
+					}
+					gallery.masterPages[gallery.currentMasterPage].style.visibility = "visible";
+					//预处理后面的图片，如果是小图，则删除该数据
+					self._preLoadPics();
+					
+				});
+				gallery.onMaxMove = function(x){
+				    if(!View.isLastPage){
+    				    if(x<-50){
+    				        loadBlock.className = "will-loading-more being-loading-more";
+    				        //self._showLoading(loadBlock,true);
+    				        setTimeout(function(){
+    				        	self.loadMore(gallery);
+    				        },1000);
+    				        return -80;
+    				    }
+				    }
+				}
+				gallery.onMoveOut(function () {
+					gallery.masterPages[gallery.currentMasterPage].className = 
+					gallery.masterPages[gallery.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
+				});
+				
+				gallery.onMoveIn(function () {
+					var className = gallery.masterPages[gallery.currentMasterPage].className;
+					/(^|\s)swipeview-active(\s|$)/.test(className) || 
+					(gallery.masterPages[gallery.currentMasterPage].className = 
+						!className ? 'swipeview-active' : className + ' swipeview-active');
+					
+				});
+			}
+		},
+		//预加载并删除小图
+		_preLoadPics:function(){
+		    var self = this,
+		    data = self.picData,
+		    gallery = self.swipe,
+		    page = gallery.page+2,
+		    img = new Image();
+		    if(!data[page])return;
+		    img.onload = function(){
+		        if(img.height<180||img.width<180){
+		            data.splice(page,1);
+		        }
+		        self.updataDataLength(data.length);
+		    }
+		    img.onerror = function(){
+                data.splice(page,1);
+                self.updataDataLength(data.length);
+            }
+            img.src = data[page].img+"_670x670.jpg";
+		    
+		    
+		},
+		_buildRelationIscroll:function(){
+		    var self = this,
+		    scroll = document.querySelector(".relation-article"),
+		    btn = document.querySelector(".back-to-first");
+		    btn.onclick = function(e){
+		        e.preventDefault();
+		        self.swipe.goToPage(0);
+		    }
+            scroll.addEventListener("touchmove",function(e){
+                e.stopPropagation();
+            });
+            scroll.addEventListener("touchstart",function(e){
+                e.stopPropagation();
+            });
+            new iScroll(scroll);
+		},
+		_buildItem:function(i){
+			var el,page,
+			self = this,
+			slides = self.picData,
+			loadHandler;
+			
+			var img = document.createElement("img"),
+			realImg = new Image(),
+			span = document.createElement("div");
+			span.className = "swipeview-box";
+			span.appendChild(img);
+			span.appendChild(realImg);
+			el = img;
+			
+			realImg.style.display="none";
+			//el.style.webkitTransition = "all 0s";
+			self._showLoading(span,true);
+			el.style.opacity = 0;
+			realImg.style.opacity = 0;
+			function setImg() { 
+				var that = el;
+				//that.style.cssText = "-webkit-transform:translate3d("+((viewWidth-that.clientWidth)/2)+"px,"+((viewHeight-that.clientHeight)/2)+"px,0)";
+				setTimeout(function(){
+					that.style.cssText = "position:absolute;top:50%; left:50%; margin:-"+(that.clientHeight/2)+"px -"+(that.clientWidth/2)+"px auto;"
+					that.style.opacity = 1;
+					that.className = "xxx";
+				},10);
+					
+			};
+			el.onload = setImg;
+			el.src = slides[i].img+"_60x60.jpg";
+			if(el.width&&el.height){
+			    setImg();
+			}
+			function setReal(){
+			    var that = realImg;
+                self._hideLoading(span);
+                realImg.style.display="block";
+                try{span.removeChild(el);}catch(e){}
+                setTimeout(function(){
+                        that.style.cssText = "position:absolute;top:50%; left:50%; margin:-"+(that.clientHeight/2)+"px -"+(that.clientWidth/2)+"px auto;"
+                        that.style.opacity = 1;
+                        that.className = "xxx";
+                },10);
+			}
+			realImg.onload = setReal;
+			realImg.src = slides[i].img+"_670x670.jpg";
+			if(realImg.width&&realImg.height){
+			    setReal();
+			}
+			return span;
+		},
+		_showLoading:function(obj,flag){
+			var self = this;
+			var tag = document.createElement("canvas"),
+					ctx = tag.getContext("2d"),
+					count = 0,
+					edges = 10,
+					i;
+			obj.appendChild(tag);
+			tag.width = 80;
+			tag.height = 80;
+			obj.style.position="relative";
+			tag.style.cssText = "position:absolute; top:50%; left:50%; margin:-40px 0 0 -40px; -webkit-transform:scale3d(0.5,0.5,1); -webkit-transition:all 1s; background:rgba(0,0,0,0.5); -webkit-border-radius:5px;";
+			function drawItem(){
+				ctx.save();
+				ctx.translate(tag.width/2,tag.height/2);
+				ctx.rotate(Math.PI*count/(edges/2));
+				count++;
+				for(i=0; i<edges; i++){
+					var color = (i)/edges;
+					ctx.fillStyle = "rgba(255,255,255,"+color+")";
+					ctx.rotate(Math.PI/(edges/2));
+					ctx.fillRect(-2,-20,4,10);
+				} 
+				ctx.restore();
+			}
+			drawItem();
+			if(flag){
+			    clearInterval(self.canvasInterval);
+				self.canvasInterval = setInterval(function(){
+					tag.width = tag.width;
+					drawItem();
+				},120);
+			}
+		},
+		_hideLoading:function(obj){
+			var self = this,
+			canvas = obj.getElementsByTagName("canvas")[0];
+			canvas.style.opacity=0;
+			setTimeout(function(){
+				try{
+					clearInterval(self.canvasInterval);
+					obj.removeChild(canvas);
+				}
+				catch(e){
+					
+				}
+				
+			},1000)
+			
+		},
+		/**
+		 * 更新数据长度
+		 */
+		updataDataLength:function(n){
+		    var gallery = this.swipe,
+		    endPosition = n*gallery.pageWidth;
+		    this.swipe.updatePageCount(n);
+		    try{
+		    if(this.loadBlock&&this.loadBlock.style)
+		      this.loadBlock.style.cssText = "-webkit-transform:translate3d("+endPosition+"px,0,0)";
+		     }catch(e){}
+		},
+		/**
+		 * 显示下一张
+		 */
+		goToMore:function(isLastPage){
+		    var self = this,
+		    endPosition,
+		    gallery = self.swipe;
+		    if(self.loadBlock&&!isLastPage){
+		        endPosition = (gallery.options.numberOfPages)*gallery.pageWidth;
+                self.loadBlock.className = "will-loading-more";
+                self.loadBlock.style.cssText = "-webkit-transform:translate3d("+endPosition+"px,0,0)";
+                self.loadBlock.innerHTML = ""; 
+		    }
+		    if(self.loadBlock&&isLastPage){
+		        self.loadBlock.parentNode.removeChild(self.loadBlock);
+		        self.loadBlock = null;
+		    }
+		    self.swipe.goToPage(self.swipe.page+1);
+		},
+		/**
+		 * 拖动到最后的事件
+		 */
+		loadMore:function(fn){
+		    var self = this;
+		    
+		},
+		/**
+		 * 销毁实例
+		 */
+		destroy:function(){
+			var self = this;
+			self.swipe.destroy();
+		}
+	}
+	
+})();
+
+</script>
+<script>
+userData = {
+    /**
+     * 获取值
+     */
+    get:function(key){
+        return this.data[key];
+        
+    },
+    /**
+     * 写入值
+     */
+    set:function(key,val){
+        this.data[key] = val;
+        this.sync();
+    },
+    /**
+     * 同步到本地存储
+     */
+    sync:function(){
+        localData.setData("userData",this.data);
+    },
+    /**
+     * 初始化并获取本地数据
+     */
+    init:function(){
+      this.data = localData.getData("userData")||this.data;
+    },
+    data:{
+        /**
+         * 用户正在使用的主页
+         */
+        index:"index/1",
+        /**
+         * 详情页是否使用大图模式
+         */
+        isImgMode:true
+    }
+}
+
+</script>
+<script>
+TipShow = {
+    pages:{
+        "index":{
+            tip1:{
+                img:"http://img04.taobaocdn.com/tps/i4/T1kLe7XjJfXXXXXXXX-530-90.png",
+                style:{
+                    left:"34px",
+                    top:"135px",
+                    width:"265px",
+                    height:"45px"
+                }
+            },
+            tip2:{
+                img:"http://img02.taobaocdn.com/tps/i2/T1zfe7XjdfXXXXXXXX-355-128.png",
+                style:{
+                    right:"-2px",
+                    top:"271px",
+                    width:"177.5px",
+                    height:"64px"
+                }
+            },
+            btn:{
+                img:"http://img01.taobaocdn.com/tps/i1/T1sLe7XjtfXXXXXXXX-203-87.png",
+                style:{
+                    left:"190px",
+                    top:"355px",
+                    width:"101.5px",
+                    height:"43.5px"
+                }
+            }
+        }
+    },
+    "mask":document.createElement("div"),
+    "showMask":function(){
+        var self = this;
+        
+        self.mask.style.cssText = 'width:100%; height:1000px; position:absolute; z-index:10000000; background:rgba(0,0,0,0.6);display:block;top:0; left:0;';
+        document.body.appendChild(self.mask);
+    },
+    "hideTip":function(){
+        var self = this;
+        self.mask.innerHTML = "";
+        self.mask.style.cssText = 'width:100%; height:100%; position:absolute; z-index:10000000; background:rgba(0,0,0,0.6);display:none;';
+    },
+    "curPage":null,
+    "curTips":[],
+    "init":function(){
+        var self = this, hash = location.hash;
+        for(k in self.pages){
+            if(hash.indexOf(k)>0){
+                self.curPage = k;
+            }
+        }
+        if(!self.curPage){
+            return;
+        }
+        if(localData.get(self.curPage+"tip")=="shown"){
+            return;
+        }
+        self.mask.addEventListener("touchmove",function(e){
+            e.preventDefault();
+        })
+        self.curTips = [];
+        for(k in self.pages[self.curPage]){
+            var tip = new Image(),
+            data = self.pages[self.curPage][k];
+            tip.src = data.img;
+            tip.style.position = "absolute";
+            for(n in data.style){
+               tip.style[n] = data.style[n]; 
+            }
+            self.curTips.push(tip);
+            if(k == "btn"){
+                
+            }
+        }
+        self.mask.addEventListener("click",function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            self.hideTip();
+        },false);
+    },
+    "showTip":function(){
+        var self = this;
+        if(!self.curPage){
+            return;
+        }
+        if(localData.get(self.curPage+"tip")=="shown"){
+            return;
+        }
+        localData.set(self.curPage+"tip","shown");
+        for(k in self.curTips){
+            self.mask.appendChild(self.curTips[k]);
+        }
+        self.showMask();
+    }
+}
+
+</script>
+<script>
+/*!
+ * Add to Homescreen v2.0.1 ~ Copyright (c) 2012 Matteo Spinelli, http://cubiq.org
+ * Released under MIT license, http://cubiq.org/license
+ */
+var addToHome = (function (w) {
+    var nav = w.navigator,
+        isIDevice = 'platform' in nav && (/iphone|ipod|ipad/gi).test(nav.platform),
+        isIPad,
+        isRetina,
+        isSafari,
+        isStandalone,
+        OSVersion,
+        startX = 0,
+        startY = 0,
+        lastVisit = 0,
+        isExpired,
+        isSessionActive,
+        isReturningVisitor,
+        balloon,
+        overrideChecks,
+
+        positionInterval,
+        closeTimeout,
+
+        options = {
+            autostart: true,            // Automatically open the balloon
+            returningVisitor: false,    // Show the balloon to returning visitors only (setting this to true is HIGHLY RECCOMENDED)
+            animationIn: 'drop',        // drop || bubble || fade
+            animationOut: 'fade',       // drop || bubble || fade
+            startDelay: 2000,           // 2 seconds from page load before the balloon appears
+            lifespan: 15000,            // 15 seconds before it is automatically destroyed
+            bottomOffset: 14,           // Distance of the balloon from bottom
+            expire: 0,                  // Minutes to wait before showing the popup again (0 = always displayed)
+            message: '',                // Customize your message or force a language ('' = automatic)
+            touchIcon: false,           // Display the touch icon
+            arrow: true,                // Display the balloon arrow
+            hookOnLoad: true,           // Should we hook to onload event? (really advanced usage)
+            iterations: 100             // Internal/debug use
+        },
+
+        intl = {
+            zh_cn: '您可以将此应用程式安装到您的 %device 上。请按 %icon 然后点选<strong>添加至主屏幕</strong>。'
+        };
+
+    function init () {
+        // Preliminary check, prevents all further checks to be performed on iDevices only
+        if ( !isIDevice ) return;
+
+        var now = Date.now(),
+            i;
+
+        // Merge local with global options
+        if (w.addToHomeConfig) {
+            for ( i in w.addToHomeConfig ) {
+                options[i] = w.addToHomeConfig[i];
+            }
+        }
+        if ( !options.autostart ) options.hookOnLoad = false;
+
+        isIPad = (/ipad/gi).test(nav.platform);
+        isRetina = w.devicePixelRatio && w.devicePixelRatio > 1;
+        isSafari = nav.appVersion.match(/Safari/gi);
+        isStandalone = nav.standalone;
+        
+        OSVersion = nav.appVersion.match(/OS (\d+_\d+)/i);
+        OSVersion = OSVersion[1] ? +OSVersion[1].replace('_', '.') : 0;
+        
+        lastVisit = +w.localStorage.getItem('addToHome');
+
+        isSessionActive = w.sessionStorage.getItem('addToHomeSession');
+        isReturningVisitor = options.returningVisitor ? lastVisit && lastVisit + 28*24*60*60*1000 > now : true;
+
+        if ( !lastVisit ) lastVisit = now;
+
+        // If it is expired we need to reissue a new balloon
+        isExpired = isReturningVisitor && lastVisit <= now;
+
+        if ( options.hookOnLoad ) w.addEventListener('load', loaded, false);
+        else if ( !options.hookOnLoad && options.autostart ) loaded();
+    }
+
+    function loaded () {
+        w.removeEventListener('load', loaded, false);
+
+        if ( !isReturningVisitor ) w.localStorage.setItem('addToHome', Date.now());
+        else if ( options.expire && isExpired ) w.localStorage.setItem('addToHome', Date.now() + options.expire * 60000);
+
+        if ( !overrideChecks && ( !isSafari || !isExpired || isSessionActive || isStandalone || !isReturningVisitor ) ) return;
+
+        var icons = options.touchIcon ? document.querySelectorAll('head link[rel=apple-touch-icon],head link[rel=apple-touch-icon-precomposed]') : [],
+            sizes,
+            touchIcon = '',
+            closeButton,
+            platform = nav.platform.split(' ')[0],
+            language = nav.language.replace('-', '_'),
+            i, l;
+
+        balloon = document.createElement('div');
+        balloon.id = 'addToHomeScreen';
+        balloon.style.cssText += 'left:-9999px;-webkit-transition-property:-webkit-transform,opacity;-webkit-transition-duration:0;-webkit-transform:translate3d(0,0,0);position:' + (OSVersion < 5 ? 'absolute' : 'fixed');
+
+        // Localize message
+        if ( options.message in intl ) {        // You may force a language despite the user's locale
+            language = options.message;
+            options.message = '';
+        }
+        if ( options.message === '' ) {         // We look for a suitable language (defaulted to en_us)
+            options.message = language in intl ? intl[language] : intl['zh_cn'];
+        }
+
+        // Search for the apple-touch-icon
+        if ( icons.length ) {
+            for ( i = 0, l = icons.length; i < l; i++ ) {
+                sizes = icons[i].getAttribute('sizes');
+
+                if ( sizes ) {
+                    if ( isRetina && sizes == '114x114' ) {
+                        touchIcon = icons[i].href;
+                        break;
+                    }
+                } else {
+                    touchIcon = icons[i].href;
+                }
+            }
+
+            touchIcon = '<span style="background-image:url(' + touchIcon + ')" class="addToHomeTouchIcon"></span>';
+        }
+
+        balloon.className = (isIPad ? 'addToHomeIpad' : 'addToHomeIphone') + (touchIcon ? ' addToHomeWide' : '');
+        balloon.innerHTML = touchIcon +
+            options.message.replace('%device', platform).replace('%icon', OSVersion >= 4.2 ? '<span class="addToHomeShare"></span>' : '<span class="addToHomePlus">+</span>') +
+            (options.arrow ? '<span class="addToHomeArrow"></span>' : '') +
+            '<span class="addToHomeClose">\u00D7</span>';
+
+        document.body.appendChild(balloon);
+
+        // Add the close action
+        closeButton = balloon.querySelector('.addToHomeClose');
+        if ( closeButton ) closeButton.addEventListener('click', clicked, false);
+
+        setTimeout(show, options.startDelay);
+    }
+
+    function show () {
+        var duration,
+            iPadXShift = 160;
+
+        // Set the initial position
+        if ( isIPad ) {
+            if ( OSVersion < 5 ) {
+                startY = w.scrollY;
+                startX = w.scrollX;
+                iPadXShift = 208;
+            }
+
+            balloon.style.top = startY + options.bottomOffset + 'px';
+            balloon.style.left = startX + iPadXShift - Math.round(balloon.offsetWidth / 2) + 'px';
+
+            switch ( options.animationIn ) {
+                case 'drop':
+                    duration = '0.6s';
+                    balloon.style.webkitTransform = 'translate3d(0,' + -(w.scrollY + options.bottomOffset + balloon.offsetHeight) + 'px,0)';
+                    break;
+                case 'bubble':
+                    duration = '0.6s';
+                    balloon.style.opacity = '0';
+                    balloon.style.webkitTransform = 'translate3d(0,' + (startY + 50) + 'px,0)';
+                    break;
+                default:
+                    duration = '1s';
+                    balloon.style.opacity = '0';
+            }
+        } else {
+            startY = w.innerHeight + w.scrollY;
+
+            if ( OSVersion < 5 ) {
+                startX = Math.round((w.innerWidth - balloon.offsetWidth) / 2) + w.scrollX;
+                balloon.style.left = startX + 'px';
+                balloon.style.top = startY - balloon.offsetHeight - options.bottomOffset + 'px';
+            } else {
+                balloon.style.left = '50%';
+                balloon.style.marginLeft = -Math.round(balloon.offsetWidth / 2) + 'px';
+                balloon.style.bottom = options.bottomOffset + 'px';
+            }
+
+            switch (options.animationIn) {
+                case 'drop':
+                    duration = '1s';
+                    balloon.style.webkitTransform = 'translate3d(0,' + -(startY + options.bottomOffset) + 'px,0)';
+                    break;
+                case 'bubble':
+                    duration = '0.6s';
+                    balloon.style.webkitTransform = 'translate3d(0,' + (balloon.offsetHeight + options.bottomOffset + 50) + 'px,0)';
+                    break;
+                default:
+                    duration = '1s';
+                    balloon.style.opacity = '0';
+            }
+        }
+
+        balloon.offsetHeight;   // repaint trick
+        balloon.style.webkitTransitionDuration = duration;
+        balloon.style.opacity = '1';
+        balloon.style.webkitTransform = 'translate3d(0,0,0)';
+        balloon.addEventListener('webkitTransitionEnd', transitionEnd, false);
+
+        closeTimeout = setTimeout(close, options.lifespan);
+    }
+
+    function manualShow (override) {
+        if ( !isIDevice || balloon ) return;
+
+        overrideChecks = override;
+        loaded();
+    }
+
+    function close () {
+        clearInterval( positionInterval );
+        clearTimeout( closeTimeout );
+        closeTimeout = null;
+
+        var posY = 0,
+            posX = 0,
+            opacity = '1',
+            duration = '0',
+            closeButton = balloon.querySelector('.addToHomeClose');
+
+        if ( closeButton ) closeButton.removeEventListener('click', close, false);
+
+        if ( OSVersion < 5 ) {
+            posY = isIPad ? w.scrollY - startY : w.scrollY + w.innerHeight - startY;
+            posX = isIPad ? w.scrollX - startX : w.scrollX + Math.round((w.innerWidth - balloon.offsetWidth)/2) - startX;
+        }
+
+        balloon.style.webkitTransitionProperty = '-webkit-transform,opacity';
+
+        switch ( options.animationOut ) {
+            case 'drop':
+                if ( isIPad ) {
+                    duration = '0.4s';
+                    opacity = '0';
+                    posY = posY + 50;
+                } else {
+                    duration = '0.6s';
+                    posY = posY + balloon.offsetHeight + options.bottomOffset + 50;
+                }
+                break;
+            case 'bubble':
+                if ( isIPad ) {
+                    duration = '0.8s';
+                    posY = posY - balloon.offsetHeight - options.bottomOffset - 50;
+                } else {
+                    duration = '0.4s';
+                    opacity = '0';
+                    posY = posY - 50;
+                }
+                break;
+            default:
+                duration = '0.8s';
+                opacity = '0';
+        }
+
+        balloon.addEventListener('webkitTransitionEnd', transitionEnd, false);
+        balloon.style.opacity = opacity;
+        balloon.style.webkitTransitionDuration = duration;
+        balloon.style.webkitTransform = 'translate3d(' + posX + 'px,' + posY + 'px,0)';
+    }
+
+
+    function clicked () {
+        w.sessionStorage.setItem('addToHomeSession', '1');
+        isSessionActive = true;
+        close();
+    }
+
+    function transitionEnd () {
+        balloon.removeEventListener('webkitTransitionEnd', transitionEnd, false);
+
+        balloon.style.webkitTransitionProperty = '-webkit-transform';
+        balloon.style.webkitTransitionDuration = '0.2s';
+
+        // We reached the end!
+        if ( !closeTimeout ) {
+            balloon.parentNode.removeChild(balloon);
+            balloon = null;
+            return;
+        }
+
+        // On iOS 4 we start checking the element position
+        if ( OSVersion < 5 && closeTimeout ) positionInterval = setInterval(setPosition, options.iterations);
+    }
+
+    function setPosition () {
+        var matrix = new WebKitCSSMatrix(w.getComputedStyle(balloon, null).webkitTransform),
+            posY = isIPad ? w.scrollY - startY : w.scrollY + w.innerHeight - startY,
+            posX = isIPad ? w.scrollX - startX : w.scrollX + Math.round((w.innerWidth - balloon.offsetWidth) / 2) - startX;
+
+        // Screen didn't move
+        if ( posY == matrix.m42 && posX == matrix.m41 ) return;
+
+        balloon.style.webkitTransform = 'translate3d(' + posX + 'px,' + posY + 'px,0)';
+    }
+
+    // Clear local and session storages (this is useful primarily in development)
+    function reset () {
+        w.localStorage.removeItem('addToHome');
+        w.sessionStorage.removeItem('addToHomeSession');
+    }
+
+    // Bootstrap!
+    init();
+
+    return {
+        show: manualShow,
+        close: close,
+        reset: reset
+    };
+})(this);
+
+</script>
+		<script type="text/javascript">
+			_main();
+		</script>
+	</body>
+</html>
