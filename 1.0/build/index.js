@@ -1,10 +1,16 @@
+/*
+combined files : 
+
+gallery/photoswipe/1.0/index
+
+*/
 /**
  * @fileoverview 请修改组件描述
  * @author bachi<bachi@taobao.com>
  * @module photoswipe
  **/
 
-KISSY.add(function (S,Slide,Mask,Juicer) {
+KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 
 	"use strict";
 
@@ -407,3 +413,4 @@ KISSY.add(function (S,Slide,Mask,Juicer) {
 		'node'
 	]
 });
+
