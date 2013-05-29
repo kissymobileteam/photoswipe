@@ -156,6 +156,9 @@
 </p>
 
 <script>
+	if(window.location.href.indexOf('ks-debug') < 0){
+		window.location.href="photoswipe.html?ks-debug"
+	}
     var S = KISSY;
     if (S.Config.debug) {
         var srcPath = "../../../";
