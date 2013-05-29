@@ -3,30 +3,66 @@
 <head>
     <meta charset="utf-8"/>
     <title>demo标题</title>
+
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320" />
+
+	<!-- 响应式设计代码 -->
+	<meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<!--不自动将地址和email转为链接-->
+	<meta name="format-detection" content="address=no;email=no" />
+	<!--添加到主屏时的图标-->
+	<link rel="apple-touch-icon-precomposed" href="http://img01.taobaocdn.com/tps/i1/T1p8O5XXtgXXXXXXXX-114-114.png">
+	<link rel="apple-touch-startup-image" href="http://img04.taobaocdn.com/tps/i4/T12UO6XnBuXXXXXXXX-320-460.png">
+
+	<link rel="dns-prefetch" href="http://img01.taobaocdn.com"/>
+	<link rel="dns-prefetch" href="http://img02.taobaocdn.com"/>
+	<link rel="dns-prefetch" href="http://img03.taobaocdn.com"/>
+	<link rel="dns-prefetch" href="http://img04.taobaocdn.com"/>
+	<link rel="dns-prefetch" href="http://img05.taobaocdn.com"/>
     <script src="http://a.tbcdn.cn/s/kissy/1.3.0/kissy-min.js" charset="utf-8"></script>
 </head>
 <body>
 <h2>demo标题</h2>
+<style>
+	#MS {
+		position:fixed;
+		width:100%;
+		height:100%;
+		background:black;
+
+
+	}
+	#MS-nav {
+		display:none;
+	}
+	.MS-con {
+		position:relative;
+	}
+	.MS-pal {
+		float:left;
+		position:relative;
+		-webkit-backface-visibility:hidden;
+	}
+
+	.mt0 {
+		margin-top:0px !important;
+		height:300px !important;
+	}
+
+</style>
+<h2>Demo</h2>
+<p>
+<a href="photoswipe.html">photoswipe</a>
+</p>
+<p>
+<a href="test.html">完整的例子</a>
+</p>
+
 
 <script>
-    var S = KISSY;
-    if (S.Config.debug) {
-        var srcPath = "../../../";
-        S.config({
-            packages:[
-                {
-                    name:"gallery",
-                    path:srcPath,
-                    charset:"utf-8",
-                    ignorePackageNameInUri:true
-                }
-            ]
-        });
-    }
-
-    S.use('gallery/photoswipe/1.0/index', function (S, Photoswipe) {
-         var photoswipe = new Photoswipe();
-    })
 </script>
 </body>
 </html>
