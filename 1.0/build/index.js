@@ -14,16 +14,14 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 
 	"use strict";
 
-	function PhotoSwipe(id,cfg) {
+	function PhotoSwipe(cfg) {
 		if (this instanceof PhotoSwipe) {
-
-			this.con = S.one(id);
 
 			PhotoSwipe.superclass.constructor.call(this, cfg);
 			this.init();
 
 		} else {
-			return new PhotoSwipe(id,cfg);
+			return new PhotoSwipe(cfg);
 		}
 	}
 
@@ -34,12 +32,20 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 
 	// ATTR Example
 	PhotoSwipe.ATTRS = {
+		// 图片距离边界的最小宽度：默认为0
+		imgPadding:{
+			value:0	
+		},
 		id:{
 			value:'PhotoSwip-'+S.now()
 		},
 		// 划过的帧是否被删除掉
 		slideOptimize:{
 			value: true
+		},
+		// 当前图片的序号，默认从0开始
+		currentIndex:{
+			value: 0
 		},
 		// 图片超过屏幕尺寸时，按照屏幕尺寸来渲染
 		overflow:{
@@ -50,7 +56,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		zoom: {
 			value:false
 		},
-		// 真实page从0,1,2开始
+		// 图集的序号,真实page从0,1,2开始
 		page:{
 			value: 0
 		},
@@ -68,8 +74,10 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		data:{
 			value: {
 				items:[
+					/*
 					{pic:'',title:''},
 					{pic:'',title:''}
+					*/
 				]
 			}
 		},
@@ -84,7 +92,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		},
 		itemHtml:{
 					 value:['<div class="ps-pal ${placeholder}">',
-						 '<div class="ps-pic-wrapper">',
+						 '<div class="ps-pic-wrapper" style="overflow:hidden;">',
 						 '<img src="${pic}" class="ps-pic" />',
 						 '</div>',
 						 '	<!--img class="ps-loading" src="http://img03.taobaocdn.com/tps/i3/T1Ou9TXCFdXXaPT2Hb-24-24.gif" /-->',
@@ -109,8 +117,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		}
 	};
 
-	S.extend(PhotoSwipe, 
-			S.Base,{
+	S.extend(PhotoSwipe, S.Base, {
 
 		init: function() {
 			// your code here
@@ -121,6 +128,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 				conClass:that.conClass,
 				autoSlide:false,
 				effect:'hSlide',
+				carousel:false,
 				touchmove:true,
 				adaptive_fixed_width:true,
 				contentClass:'ps-con',
@@ -129,15 +137,16 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 				animWrapperAutoHeightSetting:false,
 				webkitOptimize:true,
 				adaptive_width:function(){
-					return S.DOM.viewportWidth();
+					return window.innerWidth;
 				},
 				adaptive_height:function(){
-					return S.DOM.viewportHeight();
+					return window.innerHeight;
 				}
 			});
 			that.mask = Mask({
 				opacity:0.6
 			}); 
+
 			that.bindEvent();
 			
 		},
@@ -149,17 +158,18 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 			if(!node){
 				return;
 			}
+			node.attr('data-ready','true');
 			setTimeout(function(){
 				if(that.overflow === false){
-					if(node.width() > S.DOM.viewportWidth()){
-						node.width(S.DOM.viewportWidth());
+					if(node.width() > window.innerWidth){
+						node.width(window.innerWidth-that.imgPadding);
 					}
-					if(node.height() > S.DOM.viewportHeight()){
-						node.height(S.DOM.viewportHeight());
+					if(node.height() > window.innerHeight){
+						node.height(window.innerHeight-that.imgPadding);
 					}
 				}
 				var height = node.height();
-				var marginTop = (S.DOM.viewportHeight() - height) / 2;
+				var marginTop = (window.innerHeight - height) / 2;
 				node.css({
 					'margin-top':(marginTop) + 'px'	
 				});
@@ -183,19 +193,27 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		 **/
 		addData:function(items){
 			var that = this;
+			var isFirstAtlas = false;
+			if(that.data.items.length == 0){
+				isFirstAtlas = true;
+			} else {
+				isFirstAtlas = false;
+			}
 			that.data.items = that.data.items.concat(items);
 			that.set('data',that.data);
+			/*
 			S.each(items,function(v,k){
 				that.slide.add(Juicer(that.itemHtml,v));
 			});
-			var placeholder = that.con.one('.ps-placeholder');
-			placeholder && placeholder.remove();
+			*/
 			that.page ++;
 			that.set('page',that.page);
 			if(that.isVisiable()){
 				that.resetImgAlign();
 			}
-			// that.replaceLoadMore();
+			if(!isFirstAtlas){
+				that.renderAltlasLastPic();
+			}
 		},
 		// 滑块窗口内保持，窗口外的节点都清空
 		slipperFilter:function(){
@@ -252,6 +270,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 			var that = this;
 			that.slide.next.call(that.slide,callback);
 		},
+		// 创建一个空slide
 		createHtml: function(){
 			var that = this;
 			var itemsHtml = Juicer(that.itemHtml,{
@@ -267,48 +286,184 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 				display:'none',
 				left:0,
 				top:0,
-				width:S.DOM.viewportWidth(),
-				height:S.DOM.viewportHeight(),
+				width:window.innerWidth,
+				height:window.innerHeight,
 				position:'fixed',
 				'z-index':10001
 			});
 			S.one('body').append(that.con);
 
 		},
+		getIndex:function(){
+			var that = this;
+			return that.get('currentIndex');
+		},
+		setIndex:function(index){
+			var that = this;
+			that.set('currentIndex',index);
+		},
 		initParam:function(){
 			var that = this;
-			S.each(PhotoSwipe.ATTRS,function(v,k){
-				that[k] = that.get(k);
-			});
+			S.mix(that,that.getAttrVals());
 		},
 		// index，显示第几张图片
+		// index TODO
 		show:function(index){
 			var that = this;
 			if(that.con.css('display') == 'block'){
 				return;
 			}
+
 			that.con.css({
 				display:'block'	
 			});
+			/*
 			if(!S.isUndefined(index)){
-				that.slide.go(index,false);
+				// that.slide.go(index,false);
+				that.renderImg(index);
 			}
+			*/
+			that.renderImg(0);
 			that.mask.addMask();
+			// hack DOM.viewportHeight()的误差
+			try {
+				that.mask.getMask().css({
+					height:window.innerHeight + 'px'	
+				});
+			} catch(e){}
 			that.resetImgAlign();
 			if(that.con.attr('data-ps') !== 'true'){
 				that.bindExitEvent();
 				that.con.attr('data-ps','true');
 			}
 		},
+		// TODO,index
+		// 渲染第index个图片旁边的两个图片
+		// dir:left,right
+		renderImg:function(index,dir){
+			var that = this;
+
+			var placeholder = that.con.one('.ps-placeholder');
+			if(!!placeholder){
+				that.slide.add(Juicer(that.itemHtml,that.data.items[0]));
+				placeholder.remove();
+				// that.slide.add(Juicer(that.itemHtml,that.data.items[1]));
+			}
+
+			that.renderOneImg(index,dir);
+		},
+		// 图集增加时，修正上一个图集的最后一张照片
+		renderAltlasLastPic:function(){
+			// 只有在非第一次添加新的图集后调用
+			var that = this;
+			that.renderOneImg(that.getIndex(),'right');
+		},
+		// 渲染第index个图片，只渲染单个图片
+		// dir:方向:left,right
+		renderOneImg:function(index,dir){
+			var that = this;
+			if(S.isUndefined(dir)){
+				dir = 'right';
+			}
+			var currentIndex = that.getIndex();
+			that.doAfterSwitch = null;
+			// 向右滑动
+			if(dir == 'right'){
+				// S.log('right:'+that.data.items[currentIndex + 1].pic);
+				// 非最后一个
+				if(!!that.itemHtml,that.data.items[currentIndex + 1]){
+					var str = Juicer(that.itemHtml,that.data.items[currentIndex + 1]);
+					that.slide.add(S.Node(str));
+				} else  {
+					// 最后一个
+				}
+				that._replaceLoadMore();
+				that._removeOthers();
+			} else {
+				// 向左滑动
+				S.log('left:'+currentIndex);
+				if(index === 0){
+					// 第一个
+					that.slide.remove(that.slide.length - 2);
+				} else if(index == that.data.items.length - 1) {
+					debugger;
+					// 最后一个
+				} else {
+					that.doAfterSwitch = false;
+					that.slide.switch_to(1,false);
+					that.slide.add(S.Node(Juicer(that.itemHtml,that.data.items[index - 1])),0);
+					that.slide.con.all('img.ps-pic').each(function(v,k){
+						that.handleImgMarginTop(v);	
+					});
+
+					that.resetImgAlign();
+					/*
+					if(index < that.dta.items.length - 2){
+						that.slide.remove(that.slide.length - 2);
+					}
+					*/
+					that._replaceLoadMore();
+					that._removeOthers();
+				}
+			}
+			that.resetImgAlign();
+			// S.log(currentIndex);
+			// TODO 图集尾部
+			/*
+			if(index == 0){
+				that.slide.add(S.Node(Juicer(that.itemHtml,that.data.items[index + 1])));
+			} else if (index == that.data.items.length - 1){
+				that.slide.add(S.Node(Juicer(that.itemHtml,that.data.items[index - 1])),0);
+			} else {
+				that.slide.add(S.Node(Juicer(that.itemHtml,that.data.items[index + 1])));
+			}
+			*/
+		},
+		stamp:function(index){
+			var that = this;
+			var con = S.one(that.slide.pannels[that.slide.currentTab]);
+			con.attr('data-index',index);
+		},
+		// 填充一张图片
+		paddingImg:function(index){
+			var that = this;
+		},
+		_removeOthers:function(){
+			var that = this;
+			var currentIndex = that.getIndex();
+			if(currentIndex >= 2 && that.slide.currentTab > 1){
+				that.slide.remove(0);
+			}
+			if(that.slide.length >= 5 && that.hasNextAtlas()){
+				that.slide.remove(that.slide.length - 2);
+			}
+			if(that.slide.length >= 4 && !that.hasNextAtlas()){
+				that.slide.removeLast();
+			}
+			/*
+			if(that.slide.length >=4 && that.hasNextAtlas()){
+				that.slide.remove(0);
+			}
+			*/
+		},
 		resetImgAlign:function(){
 			var that = this;
-			that.slide.con.all('img.ps-pic').each(function(v,k){
-				if(v.attr('data-cultop') == 'true'){
-					return;
-				}
-				that.handleImgMarginTop(v);	
-				v.attr('data-cultop','true');
+			that.slide.con.all('img.ps-pic').each(function(img){
+				img.on('load',function(){
+					if(img.attr('data-ready') == 'true'){
+						return;
+					}
+					that.handleImgMarginTop(img);	
+					that.fire('imgLoaded',{
+						img:img	
+					});
+				});
 			});
+			/*
+			that.slide.con.all('img.ps-pic').each(function(v,k){
+				that.handleImgMarginTop(v);	
+			});
+			*/
 		},
 		hide: function(){
 			var that = this;
@@ -319,7 +474,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		},
 		bindExitEvent:function(){
 			var that = this;
-			that.slide.pannels.on('click',function(e){
+			that.slide.con.on('click',function(e){
 				if(S.one(e.target).hasClass('ps-pic')){
 					return;
 				}
@@ -346,16 +501,35 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 								that.next();
 							}
 						},30);
+
 						return false;
 					}
 				}
+				// TODO 渲染图片 jayli
 			});
 			if(that.slideOptimize){
 				that.slide.on('afterSwitch',function(e){
-					that.slipperFilter();
+					return;
+					// that.slipperFilter();
 				});
 			}
-
+			// that.renderImg(0);
+			that.slide.on('afterSwitch',function(e){
+				var dir = 'right';
+				S.log('===='+e.index);
+				if(e.index > 0){
+					that.setIndex(that.getIndex()+1);
+				} else {
+					that.setIndex(that.getIndex()-1);
+					dir = 'left';
+				}
+				if(that.doAfterSwitch === false){
+					that.setIndex(that.getIndex() + 1);
+					that.doAfterSwitch = null;
+					return;
+				}
+				that.renderImg(that.getIndex(),dir);
+			});
 		},
 		_detachEvent:function(){
 
@@ -382,7 +556,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 				}
 			} else {
 				// that._moveLoadMore();
-				loadmore && that.slide.remove(that.slide.currentTab);
+				!!loadmore && that.slide.remove(that.slide.currentTab);
 			}
 		},
 		_moveLoadMore:function(){
