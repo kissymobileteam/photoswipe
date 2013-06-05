@@ -16,6 +16,7 @@
 	<!--添加到主屏时的图标-->
 	<link rel="apple-touch-icon-precomposed" href="http://img01.taobaocdn.com/tps/i1/T1p8O5XXtgXXXXXXXX-114-114.png">
 	<link rel="apple-touch-startup-image" href="http://img04.taobaocdn.com/tps/i4/T12UO6XnBuXXXXXXXX-320-460.png">
+	<script src="http://zeptojs.com/zepto.js"></script>
 
 	<link rel="dns-prefetch" href="http://img01.taobaocdn.com"/>
 	<link rel="dns-prefetch" href="http://img02.taobaocdn.com"/>
@@ -78,7 +79,9 @@
 	window.scrollTo(0,1);
 	setTimeout(function(){
 		S.ready(function(){
-			alert(S.DOM.viewportHeight());
+			//alert(S.DOM.viewportHeight());
+			alert(window['innerHeight']);
+			alert($(window).height());
 		});
 	},1000);
 </script>
