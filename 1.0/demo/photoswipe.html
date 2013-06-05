@@ -164,6 +164,7 @@
 	if(window.location.href.indexOf('ks-debug') < 0){
 		window.location.href="photoswipe.html?ks-debug"
 	}
+	// 隐藏头部
 	window.scrollTo(0,1);
     var S = KISSY;
     if (S.Config.debug) {
@@ -184,6 +185,7 @@
 
 	setTimeout(function(){
 		S.use('mobile/photoswipe/1.0/index,json', function (S, Photoswipe,JSON) {
+			// 定义图集的来源
 			var Atlas = [
 				'tag/128/127161/1.php?tpl=minfo',
 				'tag/87/86348/1.php?tpl=minfo',
@@ -191,6 +193,7 @@
 				'tag/8/7303/1.php?tpl=minfo',
 				'tag/3/2502/1.php?tpl=minfo'
 			];
+			// 获得图集的方法
 			var getAtlas = function(index,callback){
 				window['dataAccess'] = {
 					listDataHandle:function(str){
@@ -202,9 +205,15 @@
 				S.getScript('http://it.taobao.com/'+Atlas[index]);
 			};
 
-			var photoswipe = new Photoswipe();
+			// 初始化PhotoSwipe
+			var photoswipe = new Photoswipe({
+				imgPadding:20
+			});
+
+			// 绑定滚动到结束的方法
 			photoswipe.on('edgeSwipe',function(e){
 
+				// 如果还存在下一个图集，则取数据
 				if(Atlas[e.page]){
 					getAtlas(e.page,function(data){
 						photoswipe.addData(data);
@@ -218,9 +227,12 @@
 				}
 			});
 
+			// 默认抓取第一个图集
 			getAtlas(0,function(data){
+				// 添加图集数据
 				photoswipe.addData(data);
 				if(Atlas[1]){
+					// 设置是否可以加载更多
 					photoswipe.hasNextAtlas(true);
 				} else {
 					photoswipe.hasNextAtlas(false);
@@ -228,6 +240,7 @@
 				photoswipe.show();
 			});
 
+			// 辅助操作
 			S.one('#next').on('click',function(e){
 				photoswipe.next();
 			});

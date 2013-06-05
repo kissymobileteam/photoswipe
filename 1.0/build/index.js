@@ -14,16 +14,14 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 
 	"use strict";
 
-	function PhotoSwipe(id,cfg) {
+	function PhotoSwipe(cfg) {
 		if (this instanceof PhotoSwipe) {
-
-			this.con = S.one(id);
 
 			PhotoSwipe.superclass.constructor.call(this, cfg);
 			this.init();
 
 		} else {
-			return new PhotoSwipe(id,cfg);
+			return new PhotoSwipe(cfg);
 		}
 	}
 
@@ -34,6 +32,10 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 
 	// ATTR Example
 	PhotoSwipe.ATTRS = {
+		// 图片距离边界的最小宽度：默认为0
+		imgPadding:{
+			value:0	
+		},
 		id:{
 			value:'PhotoSwip-'+S.now()
 		},
@@ -90,7 +92,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		},
 		itemHtml:{
 					 value:['<div class="ps-pal ${placeholder}">',
-						 '<div class="ps-pic-wrapper">',
+						 '<div class="ps-pic-wrapper" style="overflow:hidden;">',
 						 '<img src="${pic}" class="ps-pic" />',
 						 '</div>',
 						 '	<!--img class="ps-loading" src="http://img03.taobaocdn.com/tps/i3/T1Ou9TXCFdXXaPT2Hb-24-24.gif" /-->',
@@ -115,8 +117,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		}
 	};
 
-	S.extend(PhotoSwipe, 
-			S.Base,{
+	S.extend(PhotoSwipe, S.Base, {
 
 		init: function() {
 			// your code here
@@ -146,9 +147,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 				opacity:0.6
 			}); 
 
-
 			that.bindEvent();
-
 			
 		},
 		// 定位到viewport中央
@@ -162,15 +161,15 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 			node.attr('data-ready','true');
 			setTimeout(function(){
 				if(that.overflow === false){
-					if(node.width() > window.innerHeight){
-						node.width(window.innerWidth);
+					if(node.width() > window.innerWidth){
+						node.width(window.innerWidth-that.imgPadding);
 					}
-					if(node.height() > S.DOM.viewportHeight()){
-						node.height(S.DOM.viewportHeight());
+					if(node.height() > window.innerHeight){
+						node.height(window.innerHeight-that.imgPadding);
 					}
 				}
 				var height = node.height();
-				var marginTop = (S.DOM.viewportHeight() - height) / 2;
+				var marginTop = (window.innerHeight - height) / 2;
 				node.css({
 					'margin-top':(marginTop) + 'px'	
 				});
@@ -305,9 +304,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		},
 		initParam:function(){
 			var that = this;
-			S.each(PhotoSwipe.ATTRS,function(v,k){
-				that[k] = that.get(k);
-			});
+			S.mix(that,that.getAttrVals());
 		},
 		// index，显示第几张图片
 		// index TODO
@@ -328,6 +325,12 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 			*/
 			that.renderImg(0);
 			that.mask.addMask();
+			// hack DOM.viewportHeight()的误差
+			try {
+				that.mask.getMask().css({
+					height:window.innerHeight + 'px'	
+				});
+			} catch(e){}
 			that.resetImgAlign();
 			if(that.con.attr('data-ps') !== 'true'){
 				that.bindExitEvent();
@@ -451,6 +454,9 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 						return;
 					}
 					that.handleImgMarginTop(img);	
+					that.fire('imgLoaded',{
+						img:img	
+					});
 				});
 			});
 			/*
