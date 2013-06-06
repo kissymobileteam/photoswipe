@@ -3,7 +3,7 @@
 
 - [source](https://github.com/jayli/photoswipe)
 - by 拔赤
-- [Demo](http://mobile.kissyui.com/direct.php?type=demo&name=slide)
+- [Demo](http://mobile.kissyui.com/direct.php?type=demo&name=photoswipe)
 
 基本场景：用于图集展示的相册控件
 
