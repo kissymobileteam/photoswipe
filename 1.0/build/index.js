@@ -75,7 +75,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 			value: {
 				items:[
 					/*
-					{pic:'',title:''},
+					{pic:'',title:'',width:'23',height:'45'},
 					{pic:'',title:''}
 					*/
 				]
@@ -93,7 +93,7 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 		itemHtml:{
 					 value:['<div class="ps-pal ${placeholder}">',
 						 '<div class="ps-pic-wrapper" style="overflow:hidden;">',
-						 '<img src="${pic}" class="ps-pic" />',
+						 '<img src="${pic}" width="${width}" height="${height}" class="ps-pic" />',
 						 '</div>',
 						 '	<!--img class="ps-loading" src="http://img03.taobaocdn.com/tps/i3/T1Ou9TXCFdXXaPT2Hb-24-24.gif" /-->',
 						 '</div>'].join('')
@@ -161,10 +161,13 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 			node.attr('data-ready','true');
 			setTimeout(function(){
 				if(that.overflow === false){
+					node.width('');
+					node.height('');
 					if(node.width() > window.innerWidth){
 						node.width(window.innerWidth-that.imgPadding);
 					}
 					if(node.height() > window.innerHeight){
+						node.width('');
 						node.height(window.innerHeight-that.imgPadding);
 					}
 				}
@@ -516,7 +519,6 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 			// that.renderImg(0);
 			that.slide.on('afterSwitch',function(e){
 				var dir = 'right';
-				S.log('===='+e.index);
 				if(e.index > 0){
 					that.setIndex(that.getIndex()+1);
 				} else {
@@ -529,6 +531,12 @@ KISSY.add('mobile/photoswipe/1.0/index',function (S,Slide,Mask,Juicer) {
 					return;
 				}
 				that.renderImg(that.getIndex(),dir);
+			});
+			S.Event.on(window,'resize',function(e){
+				that.renderOneImg(that.getIndex());
+				that.slide.con.all('img.ps-pic').each(function(v,k){
+					that.handleImgMarginTop(v);	
+				});
 			});
 		},
 		_detachEvent:function(){
