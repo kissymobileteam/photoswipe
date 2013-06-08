@@ -3,7 +3,7 @@
 
 - [source](https://github.com/jayli/photoswipe)
 - by 拔赤
-- [Demo](http://mobile.kissyui.com/direct.php?type=demo&name=slide)
+- [Demo](http://mobile.kissyui.com/direct.php?type=demo&name=photoswipe)
 
 基本场景：用于图集展示的相册控件
 
@@ -17,7 +17,7 @@
 		// 填充数据
 		photoswipe.addData({
 			items:[
-				{pic:'',title:''},
+				{pic:'',title:'',width:'23',height:'33'},
 				{pic:'',title:''}
 			]
 		});
@@ -54,6 +54,7 @@
 初始数据对象，默认为空，可留空，手动通过photoswipe.addData(data)添加数据，数据格式必须为
 
 	{ items:[
+		{pic:'',title:'',width:'23',height:'33'},
 		{pic:'url',title:''},
 		{pic:'url',title:''}
 		...
